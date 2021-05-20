@@ -33,4 +33,5 @@ The `Issuer` and `Audience` fields don't really matter because tokens are valida
 
 ## Running
 To run the Magnifier backend, just open in Visual Studio, select "Magnifier" from the project select dropdown and from the build type select dropdown. A MongoDB instance and a private key are required.
+
 To run the Spyglass frontend, open `Spyglass` in a terminal window then use `dotnet watch -p Spyglass.csproj run` to run and watch.
