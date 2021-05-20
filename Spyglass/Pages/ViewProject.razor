@@ -1,0 +1,56 @@
+﻿@page "/projects"
+@page "/projects/{projectId}"
+@using Magnifier.Models
+@using System.Net.Http
+@inject HttpClient Http
+
+@if (string.IsNullOrEmpty(projectId))
+{
+    <p>you fool you did not include a project id</p>
+}
+else
+{
+    if (hasInitialized)
+    {
+        <PageTitle Title="on Magnifier" />
+
+        <div class="flex flex-col justify-center items-center">
+            <iframe src="https://scratch.mit.edu/projects/@projectId/embed" allowtransparency="true" width="485" height="402" frameborder="0" scrolling="no" allowfullscreen></iframe>
+
+            @foreach (Magnifier.Models.Comment comment in comments)
+            {
+                <Comment icon="@comment.comment.author.image" username="@comment.comment.author.username" content="@comment.comment.content" />
+            }
+
+            <button @onclick="@LoadMore" class="transition duration-300 bg-primary hover:bg-primaryHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3">Load More</button>
+        </div>
+    }
+}
+
+@code {
+    private bool hasInitialized = false;
+
+    [Parameter]
+    public string projectId { get; set; }
+
+    public List<Magnifier.Models.Comment> comments { get; set; }
+
+    private int page { get; set; } = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(projectId))
+        {
+            comments = await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://localhost:5001/api/Comments/projects/{projectId}/1");
+        }
+
+        hasInitialized = true;
+    }
+
+    private async Task LoadMore()
+    {
+        page++;
+
+        comments = comments.Concat(await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://localhost:5001/api/Comments/projects/{projectId}/{page}")).ToList();
+    }
+}

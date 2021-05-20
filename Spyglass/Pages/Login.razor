@@ -1,0 +1,34 @@
+﻿@page "/login"
+@inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<Heading size="2">Login to Magnifier</Heading>
+<Heading size="3">Your auth code is:</Heading>
+<div>@authCode</div>
+<Heading size="3">Comment the code in the authentication Scratch project, then press "Done".</Heading>
+<Button onClick="@ShowAuthProject">Show Project</Button>
+<Button onClick="@CompleteAuth">Done</Button>
+
+@code {
+    private string authCode { get; set; }
+
+    private string token { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        authCode = await Http.GetStringAsync($"https://localhost:5001/api/Auth/code");
+    }
+
+    private async Task ShowAuthProject()
+    {
+        await JSRuntime.InvokeVoidAsync("window.open", "https://scratch.mit.edu/projects/529697303", "authProject", "width=512,height=402");
+    }
+
+    private async Task CompleteAuth()
+    {
+        token = await Http.GetStringAsync($"https://localhost:5001/api/Auth/token?code={authCode}");
+
+        LocalStorage.SetItem("token", token);
+    }
+}

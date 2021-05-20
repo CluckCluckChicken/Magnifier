@@ -1,0 +1,20 @@
+﻿@if (size == 1)
+{
+    <p class="text-6xl font-didactGothic">@ChildContent</p>
+}
+else if (size == 2)
+{
+    <p class="text-5xl font-didactGothic">@ChildContent</p>
+}
+else if (size == 3)
+{
+    <p class="text-4xl font-didactGothic">@ChildContent</p>
+}
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public int size { get; set; }
+}

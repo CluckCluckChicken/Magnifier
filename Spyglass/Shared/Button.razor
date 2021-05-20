@@ -1,0 +1,9 @@
+﻿<button @onclick="@onClick" class="transition duration-300 bg-primary hover:bg-primaryHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3">@ChildContent</button>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback onClick { get; set; }
+}

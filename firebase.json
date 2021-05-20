@@ -1,0 +1,17 @@
+{
+  "hosting": {
+    "target": "magnifier",
+    "public": "Spyglass/bin/Release/net5.0/publish/wwwroot",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

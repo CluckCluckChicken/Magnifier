@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31205.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Magnifier", "Magnifier\Magnifier.csproj", "{CE750B55-38BD-454D-AA5F-934E53F3438B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spyglass", "Spyglass\Spyglass.csproj", "{255A6C3F-D693-4BD3-A6D2-6D4B69A94042}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CE750B55-38BD-454D-AA5F-934E53F3438B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE750B55-38BD-454D-AA5F-934E53F3438B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE750B55-38BD-454D-AA5F-934E53F3438B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE750B55-38BD-454D-AA5F-934E53F3438B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{255A6C3F-D693-4BD3-A6D2-6D4B69A94042}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{255A6C3F-D693-4BD3-A6D2-6D4B69A94042}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{255A6C3F-D693-4BD3-A6D2-6D4B69A94042}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{255A6C3F-D693-4BD3-A6D2-6D4B69A94042}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CC3EC97B-457E-40CB-844F-CE6DF53E0234}
+	EndGlobalSection
+EndGlobal

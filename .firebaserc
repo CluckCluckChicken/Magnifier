@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "potatophant-7703c"
+  },
+  "targets": {
+    "potatophant-7703c": {
+      "hosting": {
+        "magnifier": [
+          "magnifier"
+        ]
+      }
+    }
+  }
+}

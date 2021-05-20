@@ -1,0 +1,25 @@
+﻿<div class="inline-block px-2 py-8">
+    @if (primary)
+    {
+        <a href="@href" class="transition duration-300 bg-primary hover:bg-primaryHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3">
+            @ChildContent
+        </a>
+    }
+    else
+    {
+        <a href="@href" class="transition duration-300 bg-none hover:bg-primaryHover active:outline-none focus:outline-none text-white font-dosis text-4xl rounded-2xl p-3">
+            @ChildContent
+        </a>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string href { get; set; }
+
+    [Parameter]
+    public bool primary { get; set; }
+}

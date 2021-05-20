@@ -1,0 +1,29 @@
+﻿@inject IJSRuntime JSRuntime;
+
+@code {
+    private String _title = "";
+    [Parameter]
+    public String Title
+    {
+        get
+        {
+            return this._title;
+        }
+        set
+        {
+            this._title = value;
+            setTitle();
+        }
+    }
+
+
+    protected override void OnInitialized()
+    {
+        setTitle();
+    }
+
+    private void setTitle()
+    {
+        JSRuntime.InvokeAsync<string>("setTitle", new object[] { this._title });
+    }
+}

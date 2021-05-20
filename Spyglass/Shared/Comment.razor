@@ -1,0 +1,20 @@
+﻿<div class="flex flex-row w-1/2">
+    <a href="https://scratch.mit.edu/users/@username" target="_blank" rel="noopener noreferrer">
+        <img src="@icon" class="rounded float-left mr-2" style="width: 60px; height: 60px;" />
+    </a>
+    <div class="flex flex-col w-full mb-6">
+        <a href="https://scratch.mit.edu/users/@username" target="_blank" rel="noopener noreferrer" class="font-bold text-blue mb-2">@username</a>
+        <div class="bg-white rounded-lg w-full p-3">@content</div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string icon { get; set; }
+
+    [Parameter]
+    public string username { get; set; }
+
+    [Parameter]
+    public string content { get; set; }
+}
