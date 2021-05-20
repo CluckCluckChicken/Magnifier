@@ -1,4 +1,5 @@
 # Magnifier
+Scratch comment reactions.
 
 ## Instructions
 The Magnifier backend is a C# ASP.NET Core Web API located in `Magnifier`  
