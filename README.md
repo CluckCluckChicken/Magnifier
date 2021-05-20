@@ -1,9 +1,9 @@
 # Magnifier
-Scratch comment reactions.
+Scratch comment reactions
 
 ## Instructions
-The Magnifier backend is a C# ASP.NET Core Web API located in `Magnifier`  
-Spyglass, the frontend, is a C# ASP.NET Core Blazor WASM app located in `Spyglass`
+The Magnifier backend is a C# ASP.NET Core Web API located in `Magnifier`.  
+Spyglass, the frontend, is a C# ASP.NET Core Blazor WASM app located in `Spyglass`.
 
 ## Config
 The backend needs a config file to function. Create `Magnifier/appsettings.json` and put in it this:
