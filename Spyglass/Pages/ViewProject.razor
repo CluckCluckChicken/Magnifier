@@ -19,7 +19,7 @@ else
 
             @foreach (Magnifier.Models.Comment comment in comments)
             {
-                <Comment icon="@comment.comment.author.image" username="@comment.comment.author.username" content="@comment.comment.content" />
+                <Comment projectId="@projectId" commentId="@comment.commentId.ToString()" icon="@comment.comment.author.image" username="@comment.comment.author.username" content="@comment.comment.content" />
             }
 
             <button @onclick="@LoadMore" class="transition duration-300 bg-primary hover:bg-primaryHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3">Load More</button>

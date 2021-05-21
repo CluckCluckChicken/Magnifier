@@ -7,10 +7,10 @@ namespace Magnifier.Models
 {
     public record Reaction
     {
-        public Reaction(string _name, string _emoji)
+        public Reaction(string name, string emoji)
         {
-            name = _name;
-            emoji = _emoji;
+            this.name = name;
+            this.emoji = emoji;
         }
 
         public string id { get; set; }

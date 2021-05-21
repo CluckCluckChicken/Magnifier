@@ -1,14 +1,37 @@
-﻿<div class="flex flex-row w-1/2">
+﻿@using Magnifier.Models
+@inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
+@inject HttpClient Http
+
+<div class="flex flex-row w-1/2">
     <a href="https://scratch.mit.edu/users/@username" target="_blank" rel="noopener noreferrer">
         <img src="@icon" class="rounded float-left mr-2" style="width: 60px; height: 60px;" />
     </a>
     <div class="flex flex-col w-full mb-6">
         <a href="https://scratch.mit.edu/users/@username" target="_blank" rel="noopener noreferrer" class="font-bold text-blue mb-2">@username</a>
         <div class="bg-white rounded-lg w-full p-3">@content</div>
+        <div id="bottom-row">
+            <div id="reaction-buttons">
+                @if (hasInitialized)
+                {
+                    foreach (Reaction reaction in reactions)
+                    {
+                        <button @onclick="(e => React(reaction.name))">@reaction.emoji</button>
+                    }
+                }
+            </div>
+        </div>
     </div>
 </div>
 
 @code {
+    private bool hasInitialized = false;
+
+    [Parameter]
+    public string projectId { get; set; }
+
+    [Parameter]
+    public string commentId { get; set; }
+
     [Parameter]
     public string icon { get; set; }
 
@@ -17,4 +40,20 @@
 
     [Parameter]
     public string content { get; set; }
+
+    private List<Reaction> reactions { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        reactions = await Http.GetFromJsonAsync<List<Reaction>>($"https://localhost:5001/api/Reactions");
+
+        hasInitialized = true;
+    }
+
+    private async Task React(string reaction)
+    {
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"https://localhost:5001/api/Comments/{projectId}/{commentId}/reactions?reaction={reaction}");
+        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", LocalStorage.GetItem<string>("token"));
+        await Http.SendAsync(request);
+    }
 }

@@ -68,6 +68,14 @@ namespace Magnifier
             services.AddSingleton<JwtAuthService>();
             services.AddSingleton<AuthCodeService>();
 
+            services.AddCors(policy =>
+            {
+                policy.AddPolicy("CorsPolicy", opt => opt
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod());
+            });
+
             services.AddControllers();
 
             services.AddSwaggerGen(c =>
