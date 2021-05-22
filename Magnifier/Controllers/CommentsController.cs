@@ -24,15 +24,41 @@ namespace Magnifier.Controllers
             reactionService = _reactionService;
         }
 
-        [HttpGet("{commentId}")]
-        public ActionResult GetComment(int commentId)
+        [HttpGet("{projectId}/{commentId}")]
+        public async Task<ActionResult> GetCommentAsync(int projectId, int commentId)
         {
-            if (commentService.Get(commentId) != null)
+            if (commentService.Get(commentId) == null)
             {
-                return Ok(commentService.Get(commentId));
+                HttpClient client = new HttpClient();
+                var response = await client.GetAsync($"https://api.scratch.mit.edu/projects/{projectId}");
+                var data = await response.Content.ReadAsStringAsync();
+
+                ScratchProject project = JsonConvert.DeserializeObject<ScratchProject>(data);
+
+                string projectOwner = project.author.username;
+
+                response = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{commentId}");
+                data = await response.Content.ReadAsStringAsync();
+
+                ScratchComment comment = JsonConvert.DeserializeObject<ScratchComment>(data);
+
+                response = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{comment.id}/replies");
+                data = await response.Content.ReadAsStringAsync();
+
+                var scratchCommentReplies = JsonConvert.DeserializeObject<List<ScratchComment>>(data);
+
+                List<int> replies = new List<int>();
+
+                foreach (ScratchComment scratchComment in scratchCommentReplies)
+                {
+                    commentService.Create(new Comment(scratchComment.id, scratchComment, new List<int>()));
+                    replies.Add(scratchComment.id);
+                }
+
+                commentService.Create(new Comment(comment.id, comment, replies));
             }
 
-            return NotFound("comment has never been reacted to");
+            return Ok(commentService.Get(commentId));
         }
 
         [HttpGet("projects/{projectId}/{page}")]
@@ -60,13 +86,34 @@ namespace Magnifier.Controllers
 
             foreach (ScratchComment comment in comments)
             {
+                response = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{comment.id}/replies");
+                data = await response.Content.ReadAsStringAsync();
+
+                var scratchCommentReplies = JsonConvert.DeserializeObject<List<ScratchComment>>(data);
+
+                List<int> replies = new List<int>();
+
+                foreach (ScratchComment scratchComment in scratchCommentReplies)
+                {
+                    commentService.Create(new Comment(scratchComment.id, scratchComment, new List<int>()));
+                    replies.Add(scratchComment.id);
+                }
+
                 if (dbComments.Find(dbComment => dbComment.commentId == comment.id) == null)
                 {
-                    commentService.Create(new Comment(comment.id, comment));
+                    commentService.Create(new Comment(comment.id, comment, replies));
                 }
             }
 
+            dbComments = commentService.Get();
+
             List<Comment> matchingComments = commentService.Get().FindAll(comment => comments.Find(scratchComment => scratchComment.id == comment.commentId) != null);
+
+            matchingComments = matchingComments
+                .Where(p => p.comment.datetime_created.HasValue)
+                .OrderBy(p => p.comment.datetime_created.Value)
+                .Reverse()
+                .ToList();
 
             return Ok(System.Text.Json.JsonSerializer.Serialize(matchingComments));
         }
@@ -75,12 +122,24 @@ namespace Magnifier.Controllers
         [Authorize]
         public async Task<ActionResult> PutReactionAsync(int projectId, int commentId, string reaction)
         {
+            HttpClient client = new HttpClient();
+            var response = await client.GetAsync($"https://api.scratch.mit.edu/projects/{projectId}");
+            var data = await response.Content.ReadAsStringAsync();
+
+            ScratchProject project = JsonConvert.DeserializeObject<ScratchProject>(data);
+
+            if (project.author == null)
+            {
+                return BadRequest("that project doesnt exist");
+            }
+
+            string projectOwner = project.author.username;
+
             Comment comment;
 
-            string projectUrl = $"https://api.scratch.mit.edu/users/potatophant/projects/{projectId}";
+            string projectUrl = $"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}";
 
-            HttpClient client = new HttpClient();
-            HttpResponseMessage response = await client.GetAsync(projectUrl);
+            response = await client.GetAsync(projectUrl);
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
@@ -89,11 +148,24 @@ namespace Magnifier.Controllers
 
             if (commentService.Get(commentId) == null)
             {
-                string commentUrl = $"https://api.scratch.mit.edu/users/potatophant/projects/{projectId}/comments/{commentId}";
+                string commentUrl = $"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{commentId}";
 
                 response = await client.GetAsync(commentUrl);
 
-                comment = commentService.Create(new Comment(commentId, JsonConvert.DeserializeObject<ScratchComment>(await response.Content.ReadAsStringAsync())));
+                var repliesResponse = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{commentId}/replies");
+                data = await repliesResponse.Content.ReadAsStringAsync();
+
+                var scratchCommentReplies = JsonConvert.DeserializeObject<List<ScratchComment>>(data);
+
+                List<int> replies = new List<int>();
+
+                foreach (ScratchComment scratchComment in scratchCommentReplies)
+                {
+                    commentService.Create(new Comment(scratchComment.id, scratchComment, new List<int>()));
+                    replies.Add(scratchComment.id);
+                }
+
+                comment = commentService.Create(new Comment(commentId, JsonConvert.DeserializeObject<ScratchComment>(await response.Content.ReadAsStringAsync()), replies));
             }
             else
             {
@@ -107,9 +179,18 @@ namespace Magnifier.Controllers
 
             if (reactionService.Get(reaction) != null)
             {
-                UserReaction userReaction = new UserReaction(HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value, reaction);
+                string username = HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value;
 
-                comment.reactions.Add(userReaction);
+                UserReaction userReaction = new UserReaction(username, reaction);
+
+                if (comment.reactions.Find(userReaction => userReaction.user == username && userReaction.reaction == reaction) == null)
+                {
+                    comment.reactions.Add(userReaction);
+                }
+                else
+                {
+                    comment.reactions.Remove(comment.reactions.Find(userReaction => userReaction.user == username && userReaction.reaction == reaction));
+                }
 
                 commentService.Update(commentId, comment);
 
@@ -123,16 +204,42 @@ namespace Magnifier.Controllers
         [Authorize]
         public async Task<ActionResult> PinCommentAsync(int projectId, int commentId, bool pin = true)
         {
+            HttpClient client = new HttpClient();
+            var response = await client.GetAsync($"https://api.scratch.mit.edu/projects/{projectId}");
+            var data = await response.Content.ReadAsStringAsync();
+
+            ScratchProject project = JsonConvert.DeserializeObject<ScratchProject>(data);
+
+            if (project.author == null)
+            {
+                return BadRequest("that project doesnt exist");
+            }
+
+            string projectOwner = project.author.username;
+
             Comment comment;
 
             if (commentService.Get(commentId) == null)
             {
-                string commentUrl = $"https://api.scratch.mit.edu/users/potatophant/projects/{projectId}/comments/{commentId}";
+                string commentUrl = $"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{commentId}";
 
-                HttpClient client = new HttpClient();
-                HttpResponseMessage response = await client.GetAsync(commentUrl);
+                client = new HttpClient();
+                response = await client.GetAsync(commentUrl);
 
-                comment = commentService.Create(new Comment(commentId, JsonConvert.DeserializeObject<ScratchComment>(await response.Content.ReadAsStringAsync())));
+                var repliesResponse = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{commentId}/replies");
+                data = await repliesResponse.Content.ReadAsStringAsync();
+
+                var scratchCommentReplies = JsonConvert.DeserializeObject<List<ScratchComment>>(data);
+
+                List<int> replies = new List<int>();
+
+                foreach (ScratchComment scratchComment in scratchCommentReplies)
+                {
+                    commentService.Create(new Comment(scratchComment.id, scratchComment, new List<int>()));
+                    replies.Add(scratchComment.id);
+                }
+
+                comment = commentService.Create(new Comment(commentId, JsonConvert.DeserializeObject<ScratchComment>(await response.Content.ReadAsStringAsync()), replies));
             }
             else
             {
@@ -144,32 +251,6 @@ namespace Magnifier.Controllers
             commentService.Update(commentId, comment);
 
             return Accepted();
-        }
-
-        [HttpDelete("{commentId}/reactions")]
-        [Authorize]
-        public ActionResult DeleteReaction(int commentId, string reaction)
-        {
-            string username = HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value;
-
-            Comment comment = commentService.Get(commentId);
-
-            if (comment != null)
-            {
-                UserReaction userReaction = comment.reactions.Find(userReaction => userReaction.reaction == reaction && userReaction.user == username);
-                if (userReaction != null)
-                {
-                    comment.reactions.Remove(userReaction);
-
-                    commentService.Update(comment.commentId, comment);
-
-                    return Accepted();
-                }
-
-                return NotFound("comment doesnt have this reaction");
-            }
-
-            return NotFound("comment has never been reacted to");
         }
     }
 }

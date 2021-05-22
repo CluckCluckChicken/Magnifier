@@ -1,11 +1,37 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
 
 <header>
-    <Navbar />
+    <Navbar fixedPosition="@fixNavbar"/>
 </header>
 
 <div class="main">
-    <div class="content px-4">
-        @Body
-    </div>
+    @if (fixNavbar)
+    {
+        <div class="content p-0" style="padding: 0 !important;">
+            @Body
+        </div>
+    }
+    else
+    {
+        <div class="content px-4">
+            @Body
+        </div>
+    }
 </div>
+
+@code {
+    private bool fixNavbar { get; set; }
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += LocationChanged;
+    }
+
+    private void LocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        fixNavbar = new Uri(NavigationManager.Uri).LocalPath == "/" || new Uri(NavigationManager.Uri).LocalPath == "";
+
+        StateHasChanged();
+    }
+}

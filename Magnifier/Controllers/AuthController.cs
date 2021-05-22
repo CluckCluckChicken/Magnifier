@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using Magnifier.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -17,15 +18,16 @@ namespace Magnifier.Models
     public class AuthController : ControllerBase
     {
         private readonly JwtAuthService jwtAuthService;
-
         private readonly AuthCodeService authCodeService;
+        private readonly UserService userService;
 
-        private Uri authProject = new Uri("https://api.scratch.mit.edu/users/potatophant/projects/529697303/comments");
+        private Uri authProject = new Uri("https://api.scratch.mit.edu/users/furrycat-auth/projects/534514916/comments");
 
-        public AuthController(JwtAuthService _jwtAuthService, AuthCodeService _authCodeService)
+        public AuthController(JwtAuthService _jwtAuthService, AuthCodeService _authCodeService, UserService _userService)
         {
             jwtAuthService = _jwtAuthService;
             authCodeService = _authCodeService;
+            userService = _userService;
         }
 
         [HttpGet("code")]
@@ -63,7 +65,7 @@ namespace Magnifier.Models
 
                     foreach (ScratchComment jsonComment in apiComments)
                     {
-                        comments.Add(new ScratchComment(jsonComment.id, jsonComment.content, jsonComment.author));
+                        comments.Add(new ScratchComment(jsonComment.id, jsonComment.content, jsonComment.author, jsonComment.datetime_created));
                     }
 
                     string token = "";
@@ -73,6 +75,10 @@ namespace Magnifier.Models
                         if (comment.content == code)
                         {
                             authCodeService.Update(code, new AuthCode(code, true));
+                            if (userService.Get(comment.author.username) == null)
+                            {
+                                userService.Create(new User(comment.author.username, comment.author, comment.author.username == "potatophant"));
+                            }
                             token = jwtAuthService.GenerateJwt(code, comment.author.username, comment.author.username == "potatophant");
                         }
                     }
@@ -89,6 +95,20 @@ namespace Magnifier.Models
             }
 
             return Unauthorized();
+        }
+
+        [HttpGet("user")]
+        [Authorize]
+        public ActionResult GetUser()
+        {
+            User user = userService.Get(HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value);
+
+            if (user != null)
+            {
+                return Ok(JsonConvert.SerializeObject(user));
+            }
+
+            return NotFound();
         }
     }
 }

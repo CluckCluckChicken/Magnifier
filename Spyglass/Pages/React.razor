@@ -1,0 +1,19 @@
+﻿@page "/react"
+@page "/react/{projectId}/{commentId}"
+
+@if (string.IsNullOrEmpty(commentId) || string.IsNullOrEmpty(projectId))
+{
+    <p>you need to include a project id and a comment id.</p>
+}
+else
+{
+    <ReactMenu projectId="@projectId" commentId="@commentId" />
+}
+
+@code {
+    [Parameter]
+    public string commentId { get; set; }
+
+    [Parameter]
+    public string projectId { get; set; }
+}

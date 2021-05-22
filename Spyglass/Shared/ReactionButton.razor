@@ -1,0 +1,82 @@
+﻿@using Magnifier.Models
+@using Services
+@inject AuthenticationService AuthenticationService
+@inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
+@inject HttpClient Http
+
+@if (hasInitialised)
+{
+    if (hasReacted)
+    {
+        <button @onclick="(e => React(reaction.name))" class="bg-primary hover:bg-primaryHover active:outline-none focus:outline-none rounded-md p-1 mr-1 mt-1"><span>@reaction.emoji</span> <span>@count</span></button>
+    }
+    else
+    {
+        <button @onclick="(e => React(reaction.name))" class="hover:bg-white active:outline-none focus:outline-none rounded-md p-1 mr-1 mt-1"><span>@reaction.emoji</span> <span>@count</span></button>
+    }
+}
+
+@code {
+    private bool hasInitialised = false;
+
+    [Parameter]
+    public string projectId { get; set; }
+
+    [Parameter]
+    public string commentId { get; set; }
+
+    [Parameter]
+    public Reaction reaction { get; set; }
+
+    public int count { get; private set; }
+
+    public bool hasReacted { get; private set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        AuthenticationService.Initialize();
+
+        await GetReactions();
+
+        hasInitialised = true;
+    }
+
+    private async Task GetReactions()
+    {
+        Magnifier.Models.Comment comment = await Http.GetFromJsonAsync<Magnifier.Models.Comment>($"https://localhost:5001/api/Comments/{projectId}/{commentId}");
+
+        count = 0;
+
+        if (comment.reactions != null && comment.reactions.Count != 0)
+        {
+            foreach (UserReaction reaction in comment.reactions)
+            {
+                if (reaction.reaction == this.reaction.name)
+                {
+                    count++;
+                }
+
+                if (reaction.user == AuthenticationService.user.username && reaction.reaction == this.reaction.name)
+                {
+                    hasReacted = true;
+                }
+            }
+        }
+        else
+        {
+            hasReacted = false;
+        }
+    }
+
+    private async Task React(string reaction)
+    {
+        count += hasReacted ? -1 : 1;
+        hasReacted = !hasReacted;
+
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"https://localhost:5001/api/Comments/{projectId}/{commentId}/reactions?reaction={reaction}");
+        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", LocalStorage.GetItem<string>("token"));
+        await Http.SendAsync(request);
+
+        await GetReactions();
+    }
+}

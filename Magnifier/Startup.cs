@@ -67,6 +67,7 @@ namespace Magnifier
             services.AddSingleton<ReactionService>();
             services.AddSingleton<JwtAuthService>();
             services.AddSingleton<AuthCodeService>();
+            services.AddSingleton<UserService>();
 
             services.AddCors(policy =>
             {

@@ -1,6 +1,7 @@
 ﻿@page "/projects"
 @page "/projects/{projectId}"
 @using Magnifier.Models
+@using System.Net
 @using System.Net.Http
 @inject HttpClient Http
 
@@ -10,7 +11,7 @@
 }
 else
 {
-    if (hasInitialized)
+    if (hasInitialised)
     {
         <PageTitle Title="on Magnifier" />
 
@@ -19,7 +20,7 @@ else
 
             @foreach (Magnifier.Models.Comment comment in comments)
             {
-                <Comment projectId="@projectId" commentId="@comment.commentId.ToString()" icon="@comment.comment.author.image" username="@comment.comment.author.username" content="@comment.comment.content" />
+                <Comment projectId="@projectId" commentId="@comment.commentId.ToString()" icon="@comment.comment.author.image" username="@comment.comment.author.username" content="@comment.comment.content" dateCreated="@comment.comment.datetime_created" replyIds="@comment.replies" />
             }
 
             <button @onclick="@LoadMore" class="transition duration-300 bg-primary hover:bg-primaryHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3">Load More</button>
@@ -28,7 +29,7 @@ else
 }
 
 @code {
-    private bool hasInitialized = false;
+    private bool hasInitialised = false;
 
     [Parameter]
     public string projectId { get; set; }
@@ -42,9 +43,14 @@ else
         if (!string.IsNullOrEmpty(projectId))
         {
             comments = await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://localhost:5001/api/Comments/projects/{projectId}/1");
+
+            foreach (Magnifier.Models.Comment comment in comments)
+            {
+                comment.comment.content = WebUtility.HtmlDecode(comment.comment.content);
+            }
         }
 
-        hasInitialized = true;
+        hasInitialised = true;
     }
 
     private async Task LoadMore()
@@ -52,5 +58,10 @@ else
         page++;
 
         comments = comments.Concat(await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://localhost:5001/api/Comments/projects/{projectId}/{page}")).ToList();
+
+        foreach (Magnifier.Models.Comment comment in comments)
+        {
+            comment.comment.content = WebUtility.HtmlDecode(comment.comment.content);
+        }
     }
 }

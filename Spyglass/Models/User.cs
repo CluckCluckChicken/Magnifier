@@ -1,6 +1,4 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -10,16 +8,14 @@ namespace Magnifier.Models
 {
     public record User
     {
-        public User(string _username, ScratchCommentAuthor _scratchUser, bool _isAdmin)
+        public User(string username, ScratchCommentAuthor scratchUser, bool isAdmin)
         {
-            username = _username;
-            scratchUser = _scratchUser;
-            isAdmin = _isAdmin;
+            this.username = username;
+            this.scratchUser = scratchUser;
+            this.isAdmin = isAdmin;
             created = DateTime.Now;
         }
 
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string id { get; set; }
 
         public string username { get; set; } // This user's Scratch username

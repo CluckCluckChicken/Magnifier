@@ -9,15 +9,16 @@ namespace Magnifier.Models
 {
     public record Comment
     {
-        public Comment(int _commentId, ScratchComment _comment)
+        public Comment(int _commentId, ScratchComment _comment, List<int> _replies)
         {
             commentId = _commentId;
             comment = _comment;
+            replies = _replies;
         }
 
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string id { get; set; }
+        public string _id { get; set; }
 
         public int commentId { get; set; }
 
@@ -26,5 +27,7 @@ namespace Magnifier.Models
         public List<UserReaction> reactions { get; set; }
 
         public bool isPinned { get; set; }
+
+        public List<int> replies { get; set; }
     }
 }

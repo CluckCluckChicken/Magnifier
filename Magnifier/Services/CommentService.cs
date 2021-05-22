@@ -27,7 +27,10 @@ namespace Magnifier.Services
 
         public Comment Create(Comment comment)
         {
-            comments.InsertOne(comment);
+            if (Get(comment.commentId) == null)
+            {
+                comments.InsertOne(comment);
+            }
             return comment;
         }
 
@@ -35,9 +38,9 @@ namespace Magnifier.Services
             comments.ReplaceOne(comment => comment.commentId == commentId, commentIn);
 
         public void Remove(Comment commentIn) =>
-            comments.DeleteOne(comment => comment.id == commentIn.id);
+            comments.DeleteOne(comment => comment._id == commentIn._id);
 
         public void Remove(string id) =>
-            comments.DeleteOne(comment => comment.id == id);
+            comments.DeleteOne(comment => comment._id == id);
     }
 }

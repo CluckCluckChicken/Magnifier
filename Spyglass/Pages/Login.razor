@@ -1,9 +1,13 @@
 ﻿@page "/login"
+@using Services
 @inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
+@inject AuthenticationService AuthenticationService
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
 
-<Heading size="2">Login to Magnifier</Heading>
+<PageTitle Title="Magnifier" />
+
+<Heading size="2">Log in to Magnifier</Heading>
 <Heading size="3">Your auth code is:</Heading>
 <div>@authCode</div>
 <Heading size="3">Comment the code in the authentication Scratch project, then press "Done".</Heading>
@@ -12,8 +16,6 @@
 
 @code {
     private string authCode { get; set; }
-
-    private string token { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -27,8 +29,6 @@
 
     private async Task CompleteAuth()
     {
-        token = await Http.GetStringAsync($"https://localhost:5001/api/Auth/token?code={authCode}");
-
-        LocalStorage.SetItem("token", token);
+        await AuthenticationService.Login(authCode);
     }
 }
