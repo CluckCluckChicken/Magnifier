@@ -118,6 +118,19 @@ namespace Magnifier.Controllers
             return Ok(commentService.Get(commentId));
         }
 
+        [HttpGet("projects/{projectId}/exists")]
+        public async Task<ActionResult> GetIfProjectExistsAsync(int projectId)
+        {
+            ScratchRequestResponse requestResponse = await GetScratchProject(projectId);
+
+            if (!requestResponse.succeeded)
+            {
+                return NotFound(requestResponse.statusCode.ToString());
+            }
+
+            return Ok();
+        }
+
         [HttpGet("projects/{projectId}/{page}")]
         public async System.Threading.Tasks.Task<ActionResult> GetProjectCommentsAsync(int projectId, int page)
         {

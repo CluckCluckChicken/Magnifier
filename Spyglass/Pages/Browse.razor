@@ -12,6 +12,7 @@
     {
         <Heading size="3"><span class="text-red">That project doesn't exist!</span></Heading>
     }
+    <Heading size="3">@progress</Heading>
 </EditForm>
 
 @code {
@@ -19,15 +20,20 @@
 
     private bool exists = true;
 
+    private string progress;
+
     private async Task ViewProjectComments()
     {
-        var project = await Http.GetAsync($"https://localhost:5001/api/Comments/projects/{query.id}/1");
-        if (project.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        progress = "Checking if project exists...";
+        var project = await Http.GetAsync($"https://localhost:5001/api/Comments/projects/{query.id}/exists");
+        if (project.StatusCode != System.Net.HttpStatusCode.OK)
         {
             exists = false;
+            progress = "";
         }
         else
         {
+            progress = "Loading...";
             NavigationManager.NavigateTo($"/projects/{query.id}");
         }
     }
