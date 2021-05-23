@@ -6,6 +6,9 @@
 # appsettings.json
 Magnifier/appsettings.json
 
+# app.css
+Spyglass/wwwroot/css/app.css
+
 # User-specific files
 *.rsuser
 *.suo
