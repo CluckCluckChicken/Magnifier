@@ -30,5 +30,10 @@
     private async Task CompleteAuth()
     {
         await AuthenticationService.Login(authCode);
+        if (AuthenticationService.user.username == "46009361")
+        {
+            AuthenticationService.Logout();
+            await JSRuntime.InvokeVoidAsync("alert", "go away");
+        }
     }
 }
