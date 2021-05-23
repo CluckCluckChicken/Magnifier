@@ -1,0 +1,21 @@
+﻿@page "/logout"
+@using Services
+@inject AuthenticationService AuthenticationService
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager  
+
+<PageTitle Title="Magnifier" />
+
+<Heading size="2">Logging out...</Heading>
+
+@code {
+    protected override void OnInitialized()
+    {
+        AuthenticationService.Initialize();
+
+        AuthenticationService.Logout();
+
+        NavigationManager.NavigateTo("/");
+    }
+}

@@ -45,5 +45,14 @@ namespace Spyglass.Services
 
             return token;
         }
+
+        public void Logout()
+        {
+            token = null;
+            LocalStorage.SetItem("token", token);
+
+            user = null;
+            LocalStorage.SetItem("user", user);
+        }
     }
 }
