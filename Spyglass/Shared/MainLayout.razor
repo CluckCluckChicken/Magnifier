@@ -26,6 +26,10 @@
     protected override void OnInitialized()
     {
         NavigationManager.LocationChanged += LocationChanged;
+
+        fixNavbar = new Uri(NavigationManager.Uri).LocalPath == "/" || new Uri(NavigationManager.Uri).LocalPath == "";
+
+        StateHasChanged();
     }
 
     private void LocationChanged(object sender, LocationChangedEventArgs e)
