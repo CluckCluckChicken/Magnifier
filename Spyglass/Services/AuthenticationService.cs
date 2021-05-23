@@ -1,5 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using Magnifier.Models;
+using Spyglass.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,22 +29,29 @@ namespace Spyglass.Services
             user = LocalStorage.GetItem<User>("user");
         }
 
-        public async Task<string> Login(string authCode)
+        public async Task<AuthenticationResponse> Login(string authCode)
         {
-            token = await Http.GetStringAsync($"https://localhost:5001/api/Auth/token?code={authCode}");
+            HttpResponseMessage response = await Http.GetAsync($"https://localhost:5001/api/Auth/token?code={authCode}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new AuthenticationResponse(response, null);
+            }
+
+            token = await response.Content.ReadAsStringAsync();
 
             LocalStorage.SetItem("token", token);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"https://localhost:5001/api/Auth/user");
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", LocalStorage.GetItem<string>("token"));
-            HttpResponseMessage response = await Http.SendAsync(request);
-            string json = await response.Content.ReadAsStringAsync();
+            HttpResponseMessage userResponse = await Http.SendAsync(request);
+            string json = await userResponse.Content.ReadAsStringAsync();
 
             user = System.Text.Json.JsonSerializer.Deserialize<User>(json);
 
             LocalStorage.SetItem("user", user);
 
-            return token;
+            return new AuthenticationResponse(response, token); ;
         }
 
         public void Logout()

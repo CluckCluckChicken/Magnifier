@@ -1,9 +1,11 @@
 ﻿@page "/login"
+@using Models
 @using Services
 @inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
 @inject AuthenticationService AuthenticationService
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
 
 <PageTitle Title="Magnifier" />
 
@@ -13,9 +15,15 @@
 <Heading size="3">Comment the code in the authentication Scratch project, then press "Done".</Heading>
 <Button onClick="@ShowAuthProject">Show Project</Button>
 <Button onClick="@CompleteAuth">Done</Button>
+@if (failed)
+{
+    <Heading size="3"><span class="text-red">Auth failed. Make the comment that you post contains just the code and nothing else.</span></Heading>
+}
 
 @code {
     private string authCode { get; set; }
+
+    private bool failed { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -29,11 +37,20 @@
 
     private async Task CompleteAuth()
     {
-        await AuthenticationService.Login(authCode);
-        if (AuthenticationService.user.username == "46009361")
+        AuthenticationResponse response = await AuthenticationService.Login(authCode);
+
+        if (response.response.IsSuccessStatusCode)
         {
-            AuthenticationService.Logout();
-            await JSRuntime.InvokeVoidAsync("alert", "go away");
+
+            if (AuthenticationService.user.username == "46009361")
+            {
+                AuthenticationService.Logout();
+                await JSRuntime.InvokeVoidAsync("alert", "go away");
+            }
+
+            NavigationManager.NavigateTo("/");
         }
+
+        failed = true;
     }
 }

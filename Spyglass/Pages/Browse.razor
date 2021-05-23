@@ -1,4 +1,5 @@
 ﻿@page "/browse"
+@inject HttpClient Http
 @inject NavigationManager NavigationManager
 
 <PageTitle Title="Magnifier" />
@@ -7,13 +8,27 @@
 <EditForm Model="@query" OnValidSubmit="@ViewProjectComments">
     <InputText @bind-Value="@query.id" placeholder="Scratch project ID" class="transition duration-300 bg-white hover:bg-whiteHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3"></InputText>
     <button type="submit" class="transition duration-300 bg-primary hover:bg-primaryHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3">View comments</button>
+    @if (!exists)
+    {
+        <Heading size="3"><span class="text-red">That project doesn't exist!</span></Heading>
+    }
 </EditForm>
 
 @code {
     private BrowseQuery query = new BrowseQuery();
 
-    private void ViewProjectComments()
+    private bool exists = true;
+
+    private async Task ViewProjectComments()
     {
-        NavigationManager.NavigateTo($"/projects/{query.id}");
+        var project = await Http.GetAsync($"https://localhost:5001/api/Comments/projects/{query.id}/1");
+        if (project.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            exists = false;
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/projects/{query.id}");
+        }
     }
 }

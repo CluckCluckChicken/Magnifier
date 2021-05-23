@@ -32,10 +32,14 @@ else
         <NavbarButton href="install">Install</NavbarButton>
         <NavbarButton href="docs">Docs</NavbarButton>
         <div class="flex-grow" />
-        <NavbarButton href="login">Log in</NavbarButton>
         @if (AuthenticationService.user != null)
         {
+            <NavbarButton href="logout">Log out</NavbarButton>
             <a href="https://scratch.mit.edu/users/@AuthenticationService.user.username" target="_blank" rel="noopener noreferrer" style="background-image: url(@AuthenticationService.user.scratchUser.image); background-repeat: no-repeat; background-position: center; background-size: contain; width: 118px;" />
+        }
+        else
+        {
+            <NavbarButton href="login">Log in</NavbarButton>
         }
     </nav>
 }
