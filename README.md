@@ -35,6 +35,8 @@ The `Issuer` and `Audience` fields don't really matter because tokens are valida
 ## Running
 You need to have at least version 5.0 of the .NET SDK installed to compile Magnifier and Spyglass, and you need Node.js and NPM to compile Spyglass.
 
+You also need a private key and a MongoDB instance.
+
 To run the Magnifier backend, just open in Visual Studio, select "Magnifier" from the project select dropdown and from the build type select dropdown. A MongoDB instance and a private key are required. The backend also supports Docker, so you can run it in Docker if you want.
 
 To run the Spyglass frontend, open `Spyglass` in a terminal window then use `npm install`, `gulp css` and then `dotnet watch -p Spyglass.csproj run` to run and watch.
