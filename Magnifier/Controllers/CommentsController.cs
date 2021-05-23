@@ -17,11 +17,68 @@ namespace Magnifier.Controllers
     {
         private readonly CommentService commentService;
         private readonly ReactionService reactionService;
+        private readonly HttpClient client;
 
         public CommentsController(CommentService _commentService, ReactionService _reactionService)
         {
             commentService = _commentService;
             reactionService = _reactionService;
+            client = new HttpClient();
+        }
+
+        private async Task<ScratchRequestResponse> GetScratchProject(int projectId)
+        {
+            HttpResponseMessage response = await client.GetAsync($"https://api.scratch.mit.edu/projects/{projectId}");
+            var data = await response.Content.ReadAsStringAsync();
+
+            return new ScratchRequestResponse(response, JsonConvert.DeserializeObject<ScratchProject>(data));
+        }
+
+        private async Task<ScratchRequestResponse> GetScratchComment(int projectId, int commentId)
+        {
+            ScratchRequestResponse requestResponse = await GetScratchProject(projectId);
+
+            if (!requestResponse.succeeded)
+            {
+                return new ScratchRequestResponse(requestResponse.response);
+            }
+
+            ScratchProject project = requestResponse.project;
+
+            string projectOwner = project.author.username;
+
+            HttpResponseMessage response = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{commentId}");
+            var data = await response.Content.ReadAsStringAsync();
+
+            return new ScratchRequestResponse(requestResponse.response, _comment: JsonConvert.DeserializeObject<ScratchComment>(data));
+        }
+
+        private async Task<ScratchRequestResponse> GetScratchCommentReplies(int projectId, int commentId)
+        {
+            ScratchRequestResponse requestResponse = await GetScratchProject(projectId);
+
+            if (!requestResponse.succeeded)
+            {
+                return new ScratchRequestResponse(requestResponse.response);
+            }
+
+            ScratchProject project = requestResponse.project;
+
+            string projectOwner = project.author.username;
+
+            requestResponse = await GetScratchComment(projectId, commentId);
+
+            if (!requestResponse.succeeded)
+            {
+                return new ScratchRequestResponse(requestResponse.response);
+            }
+
+            ScratchComment comment = requestResponse.comment;
+
+            HttpResponseMessage response = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{comment.id}/replies");
+            var data = await response.Content.ReadAsStringAsync();
+
+            return new ScratchRequestResponse(requestResponse.response, _comments: JsonConvert.DeserializeObject<List<ScratchComment>>(data));
         }
 
         [HttpGet("{projectId}/{commentId}")]
@@ -29,23 +86,23 @@ namespace Magnifier.Controllers
         {
             if (commentService.Get(commentId) == null)
             {
-                HttpClient client = new HttpClient();
-                var response = await client.GetAsync($"https://api.scratch.mit.edu/projects/{projectId}");
-                var data = await response.Content.ReadAsStringAsync();
+                ScratchRequestResponse requestResponse = await GetScratchComment(projectId, commentId);
 
-                ScratchProject project = JsonConvert.DeserializeObject<ScratchProject>(data);
+                if (!requestResponse.succeeded)
+                {
+                    return NotFound(requestResponse.statusCode.ToString());
+                }
 
-                string projectOwner = project.author.username;
+                ScratchComment comment = requestResponse.comment;
 
-                response = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{commentId}");
-                data = await response.Content.ReadAsStringAsync();
+                requestResponse = await GetScratchCommentReplies(projectId, comment.id);
 
-                ScratchComment comment = JsonConvert.DeserializeObject<ScratchComment>(data);
+                if (!requestResponse.succeeded)
+                {
+                    return NotFound(requestResponse.statusCode.ToString());
+                }
 
-                response = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{comment.id}/replies");
-                data = await response.Content.ReadAsStringAsync();
-
-                var scratchCommentReplies = JsonConvert.DeserializeObject<List<ScratchComment>>(data);
+                var scratchCommentReplies = requestResponse.comments;
 
                 List<int> replies = new List<int>();
 
@@ -64,11 +121,14 @@ namespace Magnifier.Controllers
         [HttpGet("projects/{projectId}/{page}")]
         public async System.Threading.Tasks.Task<ActionResult> GetProjectCommentsAsync(int projectId, int page)
         {
-            HttpClient client = new HttpClient();
-            var response = await client.GetAsync($"https://api.scratch.mit.edu/projects/{projectId}");
-            var data = await response.Content.ReadAsStringAsync();
+            ScratchRequestResponse requestResponse = await GetScratchProject(projectId);
 
-            ScratchProject project = JsonConvert.DeserializeObject<ScratchProject>(data);
+            if (!requestResponse.succeeded)
+            {
+                return NotFound(requestResponse.statusCode.ToString());
+            }
+
+            ScratchProject project = requestResponse.project;
 
             if (project.author == null)
             {
@@ -77,8 +137,8 @@ namespace Magnifier.Controllers
 
             string projectOwner = project.author.username;
 
-            response = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments?offset={(page - 1) * 20}");
-            data = await response.Content.ReadAsStringAsync();
+            var response = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments?offset={(page - 1) * 20}");
+            var data = await response.Content.ReadAsStringAsync();
 
             List<ScratchComment> comments = JsonConvert.DeserializeObject<List<ScratchComment>>(data);
 
@@ -86,10 +146,14 @@ namespace Magnifier.Controllers
 
             foreach (ScratchComment comment in comments)
             {
-                response = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{comment.id}/replies");
-                data = await response.Content.ReadAsStringAsync();
+                requestResponse = await GetScratchCommentReplies(projectId, comment.id);
 
-                var scratchCommentReplies = JsonConvert.DeserializeObject<List<ScratchComment>>(data);
+                if (!requestResponse.succeeded)
+                {
+                    return NotFound(requestResponse.statusCode.ToString());
+                }
+
+                var scratchCommentReplies = requestResponse.comments;
 
                 List<int> replies = new List<int>();
 
@@ -122,11 +186,14 @@ namespace Magnifier.Controllers
         [Authorize]
         public async Task<ActionResult> PutReactionAsync(int projectId, int commentId, string reaction)
         {
-            HttpClient client = new HttpClient();
-            var response = await client.GetAsync($"https://api.scratch.mit.edu/projects/{projectId}");
-            var data = await response.Content.ReadAsStringAsync();
+            ScratchRequestResponse requestResponse = await GetScratchProject(projectId);
 
-            ScratchProject project = JsonConvert.DeserializeObject<ScratchProject>(data);
+            if (!requestResponse.succeeded)
+            {
+                return NotFound(requestResponse.statusCode.ToString());
+            }
+
+            ScratchProject project = requestResponse.project;
 
             if (project.author == null)
             {
@@ -139,7 +206,7 @@ namespace Magnifier.Controllers
 
             string projectUrl = $"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}";
 
-            response = await client.GetAsync(projectUrl);
+            var response = await client.GetAsync(projectUrl);
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
@@ -153,7 +220,7 @@ namespace Magnifier.Controllers
                 response = await client.GetAsync(commentUrl);
 
                 var repliesResponse = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{commentId}/replies");
-                data = await repliesResponse.Content.ReadAsStringAsync();
+                var data = await repliesResponse.Content.ReadAsStringAsync();
 
                 var scratchCommentReplies = JsonConvert.DeserializeObject<List<ScratchComment>>(data);
 
@@ -204,11 +271,14 @@ namespace Magnifier.Controllers
         [Authorize]
         public async Task<ActionResult> PinCommentAsync(int projectId, int commentId, bool pin = true)
         {
-            HttpClient client = new HttpClient();
-            var response = await client.GetAsync($"https://api.scratch.mit.edu/projects/{projectId}");
-            var data = await response.Content.ReadAsStringAsync();
+            ScratchRequestResponse requestResponse = await GetScratchProject(projectId);
 
-            ScratchProject project = JsonConvert.DeserializeObject<ScratchProject>(data);
+            if (!requestResponse.succeeded)
+            {
+                return NotFound(requestResponse.statusCode.ToString());
+            }
+
+            ScratchProject project = requestResponse.project;
 
             if (project.author == null)
             {
@@ -223,11 +293,11 @@ namespace Magnifier.Controllers
             {
                 string commentUrl = $"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{commentId}";
 
-                client = new HttpClient();
-                response = await client.GetAsync(commentUrl);
+                var client = new HttpClient();
+                var response = await client.GetAsync(commentUrl);
 
                 var repliesResponse = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{commentId}/replies");
-                data = await repliesResponse.Content.ReadAsStringAsync();
+                var data  = await repliesResponse.Content.ReadAsStringAsync();
 
                 var scratchCommentReplies = JsonConvert.DeserializeObject<List<ScratchComment>>(data);
 
