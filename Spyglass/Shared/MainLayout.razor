@@ -2,27 +2,36 @@
 @inject NavigationManager NavigationManager
 
 <header id="header">
-    <Navbar fixedPosition="@fixNavbar"/>
+    <Navbar fixedPosition="@fixNavbar" />
 </header>
 
 <div class="main">
-    @if (fixNavbar)
-    {
-        <div id="body" class="content" style="padding: 0 !important;">
-            @Body
-        </div>
-    }
-    else
-    {
-        <div id="body" class="content px-4">
-            @Body
-        </div>
-    }
+    <div id="body" class="content" style="padding: 0 !important;">
+        @Body
+    </div>
+    <!--<div id="body" class="content px-4">
+        @Body
+    </div>-->
 </div>
 
-<footer>
-    <Footer />
-</footer>
+@if (new Uri(NavigationManager.Uri).Segments.Length >= 2)
+{
+    if (new Uri(NavigationManager.Uri).Segments[1] != "projects/" && new Uri(NavigationManager.Uri).Segments[1] != "users/" && new Uri(NavigationManager.Uri).Segments[1] != "studios/")
+    {
+        <footer>
+            <Footer />
+        </footer>
+    }
+}
+else
+{
+    if (!fixNavbar)
+    {
+        <footer>
+            <Footer />
+        </footer>
+    }
+}
 
 <iframe src="/setBodyHeight.html" class="hidden" />
 

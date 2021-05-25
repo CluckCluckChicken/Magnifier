@@ -4,37 +4,98 @@
 
 <PageTitle Title="Magnifier" />
 
-<Heading size="2">Browse comments</Heading>
-<EditForm Model="@query" OnValidSubmit="@ViewProjectComments">
-    <InputText @bind-Value="@query.id" placeholder="Scratch project ID" class="transition duration-300 bg-white hover:bg-whiteHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3"></InputText>
-    <button type="submit" class="transition duration-300 bg-primary hover:bg-primaryHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3">View comments</button>
-    @if (!exists)
-    {
-        <Heading size="3"><span class="text-red">That project doesn't exist!</span></Heading>
-    }
-    <Heading size="3">@progress</Heading>
-</EditForm>
+<div class="px-4">
+    <Heading size="2">Browse comments</Heading>
+    <EditForm Model="@projectQuery" OnValidSubmit="@ViewProjectComments">
+        <Heading size="3">Projects:</Heading>
+        <InputText @bind-Value="@projectQuery.id" placeholder="Scratch project ID" class="transition duration-300 bg-white hover:bg-whiteHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3"></InputText>
+        <button type="submit" class="transition duration-300 bg-primary hover:bg-primaryHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3">View comments</button>
+        @if (!projectExists)
+        {
+            <Heading size="3"><span class="text-red">That project doesn't exist!</span></Heading>
+        }
+        <Heading size="3">@projectProgress</Heading>
+    </EditForm>
+    <EditForm Model="@profileQuery" OnValidSubmit="@ViewProfileComments">
+        <Heading size="3">Users:</Heading>
+        <InputText @bind-Value="@profileQuery.id" placeholder="Scratch username" class="transition duration-300 bg-white hover:bg-whiteHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3"></InputText>
+        <button type="submit" class="transition duration-300 bg-primary hover:bg-primaryHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3">View comments</button>
+        @if (!profileExists)
+        {
+            <Heading size="3"><span class="text-red">That user doesn't exist!</span></Heading>
+        }
+        <Heading size="3">@profileProgress</Heading>
+    </EditForm>
+    <EditForm Model="@studioQuery" OnValidSubmit="@ViewStudioComments">
+        <Heading size="3">Studios:</Heading>
+        <InputText @bind-Value="@studioQuery.id" placeholder="Scratch studio ID" class="transition duration-300 bg-white hover:bg-whiteHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3"></InputText>
+        <button type="submit" class="transition duration-300 bg-primary hover:bg-primaryHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3">View comments</button>
+        @if (!studioExists)
+        {
+            <Heading size="3"><span class="text-red">That studio doesn't exist!</span></Heading>
+        }
+        <Heading size="3">@studioProgress</Heading>
+    </EditForm>
+</div>
 
 @code {
-    private BrowseQuery query = new BrowseQuery();
+    private BrowseQuery projectQuery = new BrowseQuery();
+    private BrowseQuery profileQuery = new BrowseQuery();
+    private BrowseQuery studioQuery = new BrowseQuery();
 
-    private bool exists = true;
+    private bool projectExists = true;
+    private bool profileExists = true;
+    private bool studioExists = true;
 
-    private string progress;
+    private string projectProgress;
+    private string profileProgress;
+    private string studioProgress;
 
     private async Task ViewProjectComments()
     {
-        progress = "Checking if project exists...";
-        var project = await Http.GetAsync($"https://localhost:5001/api/Comments/projects/{query.id}/exists");
-        if (project.StatusCode != System.Net.HttpStatusCode.OK)
+        projectProgress = "Checking if project exists...";
+        var project = await Http.GetAsync($"https://localhost:5001/api/Comments/projects/{projectQuery.id}/exists");
+        if (project.StatusCode != System.Net.HttpStatusCode.OK || projectQuery.id == "")
         {
-            exists = false;
-            progress = "";
+            projectExists = false;
+            projectProgress = "";
         }
         else
         {
-            progress = "Loading...";
-            NavigationManager.NavigateTo($"/projects/{query.id}");
+            projectProgress = "Loading...";
+            NavigationManager.NavigateTo($"/projects/{projectQuery.id}");
+        }
+    }
+
+    private async Task ViewProfileComments()
+    {
+        profileProgress = "Checking if user exists...";
+        var project = await Http.GetAsync($"https://localhost:5001/api/Comments/users/{profileQuery.id}/exists");
+        if (project.StatusCode != System.Net.HttpStatusCode.OK || profileQuery.id == "")
+        {
+            profileExists = false;
+            profileProgress = "";
+        }
+        else
+        {
+            profileProgress = "Loading...";
+            NavigationManager.NavigateTo($"/users/{profileQuery.id}");
+        }
+    }
+
+    private async Task ViewStudioComments()
+    {
+        studioProgress = "Checking if studio exists...";
+        var project = await Http.GetAsync($"https://localhost:5001/api/Comments/studios/{studioQuery.id}/exists");
+        if (project.StatusCode != System.Net.HttpStatusCode.OK || studioQuery.id == "")
+        {
+            studioExists = false;
+            studioProgress = "";
+        }
+        else
+        {
+            studioProgress = "Loading...";
+            NavigationManager.NavigateTo($"/studios/{studioQuery.id}");
         }
     }
 }

@@ -133,6 +133,32 @@ namespace Magnifier.Controllers
             return Ok();
         }
 
+        [HttpGet("users/{username}/exists")]
+        public async Task<ActionResult> GetIfUserExistsAsync(string username)
+        {
+            HttpResponseMessage response = await client.GetAsync($"https://scratch.mit.edu/users/{username}/");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound(response.StatusCode.ToString());
+            }
+
+            return Ok();
+        }
+
+        [HttpGet("studios/{studioId}/exists")]
+        public async Task<ActionResult> GetIfStudioExistsAsync(int studioId)
+        {
+            HttpResponseMessage response = await client.GetAsync($"https://scratch.mit.edu/studios/{studioId}/");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound(response.StatusCode.ToString());
+            }
+
+            return Ok();
+        }
+
         [HttpGet("projects/{projectId}/{page}")]
         public async Task<ActionResult> GetProjectCommentsAsync(int projectId, int page)
         {
