@@ -7,11 +7,14 @@ namespace Magnifier.Models
 {
     public record Comment
     {
-        public Comment(int commentId, ScratchComment comment, List<int> replies)
+        public Comment(int commentId, ScratchComment comment, bool isReply, List<int> replies)
         {
             this.commentId = commentId;
             this.comment = comment;
+            this.isReply = isReply;
             this.replies = replies;
+
+            reactions = new List<UserReaction>();
         }
 
         public string _id { get; set; }
@@ -23,6 +26,8 @@ namespace Magnifier.Models
         public List<UserReaction> reactions { get; set; }
 
         public bool isPinned { get; set; }
+
+        public bool isReply { get; set; }
 
         public List<int> replies { get; set; }
     }

@@ -20,9 +20,9 @@
         <a href="https://scratch.mit.edu/users/@username" target="_blank" rel="noopener noreferrer" class="mr-2">
             <img src="@icon" class="float-left rounded" style="width: 60px; height: 60px;" />
         </a>
-        <div class="flex flex-col w-full mb-6">
+        <div class="flex flex-col w-full mb-6" style="max-width: calc(100% - 60px - 4px);">
             <a href="https://scratch.mit.edu/users/@username" target="_blank" rel="noopener noreferrer" class="font-bold text-blue mb-2">@username</a>
-            <div class="bg-white rounded-lg w-full p-3">
+            <div class="bg-white rounded-lg break-words w-full p-3">
                 <div>
                     @content
                 </div>
@@ -31,9 +31,7 @@
                 </div>
             </div>
             <div id="bottom-row" class="flex flex-row items-center mt-1">
-                <div id="reaction-buttons">
-                    <ReactMenu projectId="@projectId" commentId="@commentId" />
-                </div>
+                <ReactMenu projectId="@projectId" commentId="@commentId" comment="@comment" />
                 <div class="flex-grow" />
                 <div id="right-buttons" class="flex flex-row showOnCommentHover">
                     <CommentButton onClick="@ViewOnScratch">View on Scratch</CommentButton>
@@ -47,18 +45,18 @@
 
     @foreach (Magnifier.Models.Comment reply in replies)
     {
-        <Comment projectId="@projectId" commentId="@reply.commentId.ToString()" icon="@reply.comment.author.image" username="@reply.comment.author.username" content="@reply.comment.content" dateCreated="@reply.comment.datetime_created" isTopLevel="false" replyIds="@emptyReplyList" />
+        <Comment projectId="@projectId" commentId="@reply.commentId.ToString()" comment="@reply" icon="@reply.comment.author.image" username="@reply.comment.author.username" content="@reply.comment.content" dateCreated="@reply.comment.datetime_created" isTopLevel="false" replyIds="@emptyReplyList" />
     }
 }
 else
 {
-    <div class="flex flex-row ml-16" style="width: calc(50% - 4rem);">
+    <div id="comment-@commentId" class="flex flex-row ml-16" style="width: calc(50% - 4rem);">
         <a href="https://scratch.mit.edu/users/@username" target="_blank" rel="noopener noreferrer" class="mr-2">
             <img src="@icon" class="float-left rounded" style="width: 60px; height: 60px;" />
         </a>
-        <div class="flex flex-col w-full mb-6">
+        <div class="flex flex-col w-full mb-6" style="max-width: calc(100% - 60px - 4px);">
             <a href="https://scratch.mit.edu/users/@username" target="_blank" rel="noopener noreferrer" class="font-bold text-blue mb-2">@username</a>
-            <div class="bg-white rounded-lg w-full p-3">
+            <div class="bg-white rounded-lg break-words w-full p-3">
                 <div>
                     @content
                 </div>
@@ -66,9 +64,13 @@ else
                     @timeAgo
                 </div>
             </div>
-            <div id="bottom-row">
-                <div id="reaction-buttons">
-                    <ReactMenu projectId="@projectId" commentId="@commentId" />
+            <div id="bottom-row" class="flex flex-row items-center mt-1">
+                <ReactMenu projectId="@projectId" commentId="@commentId" comment="@comment" />
+                <div class="flex-grow" />
+                <div id="right-buttons" class="flex flex-row showOnCommentHover">
+                    <CommentButton onClick="@ViewOnScratch">View on Scratch</CommentButton>
+                    <CommentButton onClick="@CopyLink">Copy Link</CommentButton>
+                    <CommentButton onClick="@Report">Report</CommentButton>
                 </div>
             </div>
         </div>
@@ -76,6 +78,13 @@ else
 }
 
 @code {
+    public enum CommentLocation
+    {
+        project,
+        profile,
+        studio
+    }
+
     private bool hasInitialised = false;
 
     [Parameter]
@@ -83,6 +92,9 @@ else
 
     [Parameter]
     public string commentId { get; set; }
+
+    [Parameter]
+    public Magnifier.Models.Comment comment { get; set; }
 
     [Parameter]
     public string icon { get; set; }
@@ -114,7 +126,9 @@ else
 
         foreach (int replyId in replyIds)
         {
-            var reply = await Http.GetFromJsonAsync<Magnifier.Models.Comment>($"https://localhost:5001/api/Comments/{projectId}/{replyId}");
+            Magnifier.Models.Comment reply;
+
+            reply = await Http.GetFromJsonAsync<Magnifier.Models.Comment>($"https://localhost:5001/api/Comments/{replyId}");
 
             reply.comment.content = WebUtility.HtmlDecode(reply.comment.content);
 
@@ -136,9 +150,9 @@ else
         else if (ts.TotalDays < 7)
             timeAgo = $"On {(dateCreated ?? DateTime.MinValue).DayOfWeek}";
         else if (ts.TotalDays < 30)
-            timeAgo = $"{(int)ts.TotalDays} ago";
+            timeAgo = $"{(int)ts.TotalDays} days ago";
         else if (ts.TotalDays >= 30)
-            if ((int)ts.TotalDays == 1)
+            if ((int)ts.TotalDays < 60)
                 timeAgo = $"1 month ago";
             else
                 timeAgo = $"{(int)ts.TotalDays / 30} months ago";

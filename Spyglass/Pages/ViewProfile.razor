@@ -1,5 +1,5 @@
-﻿@page "/projects"
-@page "/projects/{projectId}"
+﻿@page "/users"
+@page "/users/{username}"
 @using Magnifier.Models
 @using Services
 @using System.Net
@@ -7,9 +7,9 @@
 @inject HttpClient Http
 @inject ReactionService ReactionService
 
-@if (string.IsNullOrEmpty(projectId))
+@if (string.IsNullOrEmpty(username))
 {
-    <p>you fool you did not include a project id</p>
+    <p>they arent real claim that username now and if it contains a lowercase L make sure to also register one with a capital i otherwise digit dude will eat your face 😳</p>
 }
 else
 {
@@ -18,13 +18,13 @@ else
         <PageTitle Title="on Magnifier" />
 
         <div class="flex flex-col justify-center items-center">
-            <iframe src="https://scratch.mit.edu/projects/@projectId/embed" allowtransparency="true" width="485" height="402" frameborder="0" scrolling="no" allowfullscreen></iframe>
+            <iframe src="https://scratch.mit.edu/projects/@username/embed" allowtransparency="true" width="485" height="402" frameborder="0" scrolling="no" allowfullscreen></iframe>
 
             @foreach (Magnifier.Models.Comment comment in comments)
             {
                 if (!comment.isReply)
                 {
-                    <Comment projectId="@projectId" commentId="@comment.commentId.ToString()" comment="@comment" icon="@comment.comment.author.image" username="@comment.comment.author.username" content="@comment.comment.content" dateCreated="@comment.comment.datetime_created" replyIds="@comment.replies" />
+                    <Comment projectId="@username" commentId="@comment.commentId.ToString()" comment="@comment" icon="@comment.comment.author.image" username="@comment.comment.author.username" content="@comment.comment.content" dateCreated="@comment.comment.datetime_created" replyIds="@comment.replies" />
                 }
             }
 
@@ -44,7 +44,7 @@ else
     private bool hasInitialised = false;
 
     [Parameter]
-    public string projectId { get; set; }
+    public string username { get; set; }
 
     public List<Magnifier.Models.Comment> comments { get; set; }
 
@@ -54,11 +54,11 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        if (!string.IsNullOrEmpty(projectId))
+        if (!string.IsNullOrEmpty(username))
         {
             await ReactionService.Initialize();
 
-            comments = await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://localhost:5001/api/Comments/projects/{projectId}/1");
+            comments = await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://localhost:5001/api/Comments/users/{username}/1");
 
             foreach (Magnifier.Models.Comment comment in comments)
             {
@@ -75,7 +75,7 @@ else
 
         page++;
 
-        comments = comments.Concat(await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://localhost:5001/api/Comments/projects/{projectId}/{page}")).ToList();
+        comments = comments.Concat(await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://localhost:5001/api/Comments/users/{username}/{page}")).ToList();
 
         foreach (Magnifier.Models.Comment comment in comments)
         {

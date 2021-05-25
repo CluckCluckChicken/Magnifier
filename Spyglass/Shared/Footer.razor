@@ -1,0 +1,17 @@
+﻿@using Models 
+@inject HttpClient Http
+
+<div class="bg-darkGrey text-white font-didactGothic text-lg p-10">
+    Magnifier is made by <a href="https://scratch.mit.edu/users/potatophant/" target="_blank" rel="noopener noreferrer" class="text-blue">potatophant</a>, and is open source <a href="https://github.com/CluckCluckChicken/Magnifier" target="_blank" rel="noopener noreferrer" class="text-blue">here</a>. A list of epic gamers can be found <a href="https://github.com/CluckCluckChicken/Magnifier/stargazers" target="_blank" rel="noopener noreferrer" class="text-blue">here</a>.
+</div>
+
+@code {
+    private int starCount;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GitHubRepo repo = await Http.GetFromJsonAsync<GitHubRepo>($"https://api.github.com/repos/cluckcluckchicken/magnifier");
+
+        starCount = repo.stargazers_count;
+    }
+}

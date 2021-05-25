@@ -1,8 +1,10 @@
-﻿using Magnifier.Models;
+﻿using HtmlAgilityPack;
+using Magnifier.Models;
 using Magnifier.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -108,11 +110,11 @@ namespace Magnifier.Controllers
 
                 foreach (ScratchComment scratchComment in scratchCommentReplies)
                 {
-                    commentService.Create(new Comment(scratchComment.id, scratchComment, new List<int>()));
+                    commentService.Create(new Comment(scratchComment.id, scratchComment, true, new List<int>()));
                     replies.Add(scratchComment.id);
                 }
 
-                commentService.Create(new Comment(comment.id, comment, replies));
+                commentService.Create(new Comment(comment.id, comment, false, replies));
             }
 
             return Ok(commentService.Get(commentId));
@@ -132,7 +134,7 @@ namespace Magnifier.Controllers
         }
 
         [HttpGet("projects/{projectId}/{page}")]
-        public async System.Threading.Tasks.Task<ActionResult> GetProjectCommentsAsync(int projectId, int page)
+        public async Task<ActionResult> GetProjectCommentsAsync(int projectId, int page)
         {
             ScratchRequestResponse requestResponse = await GetScratchProject(projectId);
 
@@ -172,13 +174,13 @@ namespace Magnifier.Controllers
 
                 foreach (ScratchComment scratchComment in scratchCommentReplies)
                 {
-                    commentService.Create(new Comment(scratchComment.id, scratchComment, new List<int>()));
+                    commentService.Create(new Comment(scratchComment.id, scratchComment, true, new List<int>()));
                     replies.Add(scratchComment.id);
                 }
 
                 if (dbComments.Find(dbComment => dbComment.commentId == comment.id) == null)
                 {
-                    commentService.Create(new Comment(comment.id, comment, replies));
+                    commentService.Create(new Comment(comment.id, comment, false, replies));
                 }
             }
 
@@ -241,11 +243,11 @@ namespace Magnifier.Controllers
 
                 foreach (ScratchComment scratchComment in scratchCommentReplies)
                 {
-                    commentService.Create(new Comment(scratchComment.id, scratchComment, new List<int>()));
+                    commentService.Create(new Comment(scratchComment.id, scratchComment, true, new List<int>()));
                     replies.Add(scratchComment.id);
                 }
 
-                comment = commentService.Create(new Comment(commentId, JsonConvert.DeserializeObject<ScratchComment>(await response.Content.ReadAsStringAsync()), replies));
+                comment = commentService.Create(new Comment(commentId, JsonConvert.DeserializeObject<ScratchComment>(await response.Content.ReadAsStringAsync()), false, replies));
             }
             else
             {
@@ -318,11 +320,11 @@ namespace Magnifier.Controllers
 
                 foreach (ScratchComment scratchComment in scratchCommentReplies)
                 {
-                    commentService.Create(new Comment(scratchComment.id, scratchComment, new List<int>()));
+                    commentService.Create(new Comment(scratchComment.id, scratchComment, true, new List<int>()));
                     replies.Add(scratchComment.id);
                 }
 
-                comment = commentService.Create(new Comment(commentId, JsonConvert.DeserializeObject<ScratchComment>(await response.Content.ReadAsStringAsync()), replies));
+                comment = commentService.Create(new Comment(commentId, JsonConvert.DeserializeObject<ScratchComment>(await response.Content.ReadAsStringAsync()), false, replies));
             }
             else
             {
@@ -334,6 +336,194 @@ namespace Magnifier.Controllers
             commentService.Update(commentId, comment);
 
             return Accepted();
+        }
+
+        [HttpGet("users/{username}/{page}")]
+        public async Task<ActionResult> GetUserCommentsAsync(string username, int page)
+        {
+            string response;
+
+            try
+            {
+                response = await client.GetStringAsync($"https://scratch.mit.edu/site-api/comments/user/{username}?page={page}");
+            }
+            catch
+            {
+                return NotFound();
+            }
+
+            HtmlDocument html = new HtmlDocument();
+
+            html.LoadHtml(response);
+
+            HtmlNodeCollection commentNodes = html.DocumentNode.SelectNodes("//div[@class=\"comment \"]");
+
+            List<Comment> comments = new List<Comment>();
+
+            foreach (HtmlNode node in commentNodes)
+            {
+                HtmlNode info = node.SelectSingleNode(".//div[@class=\"info\"]");
+                HtmlNode user = node.SelectSingleNode(".//a[@id=\"comment-user\"]");
+                ScratchCommentAuthor author = new ScratchCommentAuthor(info.SelectSingleNode(".//div[@class=\"name\"]").InnerText.Trim(), user.SelectSingleNode(".//img[@class=\"avatar\"]").Attributes["src"].Value);
+                ScratchComment scratchComment = new ScratchComment(int.Parse(node.Attributes["data-comment-id"].Value), info.SelectSingleNode(".//div[@class=\"content\"]").InnerText.Trim().Replace("\n      ", ""), author, DateTime.Parse(info.SelectSingleNode(".//span[@class=\"time\"]").Attributes["title"].Value));
+
+                List<int> replies = new List<int>();
+
+                if (!node.ParentNode.HasClass("reply"))
+                {
+                    foreach (HtmlNode replyContainer in node.ParentNode.SelectSingleNode(".//ul[@class=\"replies\"]").ChildNodes)
+                    {
+                        if (replyContainer.SelectSingleNode(".//div[@class=\"comment \"]") != null)
+                        {
+                            replies.Add(int.Parse(replyContainer.SelectSingleNode(".//div[@class=\"comment \"]").Attributes["data-comment-id"].Value));
+                        }
+                    }
+                }
+
+                comments.Add(new Comment(scratchComment.id, scratchComment, node.ParentNode.HasClass("reply"), replies));
+            }
+
+            List<Comment> dbComments = commentService.Get();
+
+            foreach (Comment comment in comments)
+            {
+                if (dbComments.Find(dbComment => dbComment.commentId == comment.commentId) == null)
+                {
+                    commentService.Create(comment);
+                }
+            }
+
+            dbComments = commentService.Get();
+
+            List<Comment> matchingComments = commentService.Get().FindAll(comment => comments.Find(comment2 => comment2.commentId == comment.commentId) != null);
+
+            matchingComments = matchingComments
+                .Where(p => p.comment.datetime_created.HasValue)
+                .OrderBy(p => p.comment.datetime_created.Value)
+                .Reverse()
+                .ToList();
+
+            return Ok(System.Text.Json.JsonSerializer.Serialize(matchingComments));
+        }
+
+        [HttpGet("studios/{studioId}/{page}")]
+        public async Task<ActionResult> GetUserCommentsAsync(int studioId, int page)
+        {
+            string response;
+
+            try
+            {
+                response = await client.GetStringAsync($"https://scratch.mit.edu/site-api/comments/gallery/{studioId}?page={page}");
+            }
+            catch
+            {
+                return NotFound();
+            }
+
+            HtmlDocument html = new HtmlDocument();
+
+            html.LoadHtml(response);
+
+            HtmlNodeCollection commentNodes = html.DocumentNode.SelectNodes("//div[@class=\"comment \"]");
+
+            List<Comment> comments = new List<Comment>();
+
+            foreach (HtmlNode node in commentNodes)
+            {
+                HtmlNode info = node.SelectSingleNode(".//div[@class=\"info\"]");
+                HtmlNode user = node.SelectSingleNode(".//a[@id=\"comment-user\"]");
+                ScratchCommentAuthor author = new ScratchCommentAuthor(info.SelectSingleNode(".//div[@class=\"name\"]").InnerText.Trim(), user.SelectSingleNode(".//img[@class=\"avatar\"]").Attributes["src"].Value);
+                ScratchComment scratchComment = new ScratchComment(int.Parse(node.Attributes["data-comment-id"].Value), info.SelectSingleNode(".//div[@class=\"content\"]").InnerText.Trim().Replace("\n      ", ""), author, DateTime.Parse(info.SelectSingleNode(".//span[@class=\"time\"]").Attributes["title"].Value));
+
+                List<int> replies = new List<int>();
+
+                if (!node.ParentNode.HasClass("reply"))
+                {
+                    foreach (HtmlNode replyContainer in node.ParentNode.SelectSingleNode(".//ul[@class=\"replies\"]").ChildNodes)
+                    {
+                        if (replyContainer.SelectSingleNode(".//div[@class=\"comment \"]") != null)
+                        {
+                            replies.Add(int.Parse(replyContainer.SelectSingleNode(".//div[@class=\"comment \"]").Attributes["data-comment-id"].Value));
+                        }
+                    }
+                }
+
+                comments.Add(new Comment(scratchComment.id, scratchComment, node.ParentNode.HasClass("reply"), replies));
+            }
+
+            List<Comment> dbComments = commentService.Get();
+
+            foreach (Comment comment in comments)
+            {
+                if (dbComments.Find(dbComment => dbComment.commentId == comment.commentId) == null)
+                {
+                    commentService.Create(comment);
+                }
+            }
+
+            dbComments = commentService.Get();
+
+            List<Comment> matchingComments = commentService.Get().FindAll(comment => comments.Find(comment2 => comment2.commentId == comment.commentId) != null);
+
+            matchingComments = matchingComments
+                .Where(p => p.comment.datetime_created.HasValue)
+                .OrderBy(p => p.comment.datetime_created.Value)
+                .Reverse()
+                .ToList();
+
+            return Ok(System.Text.Json.JsonSerializer.Serialize(matchingComments));
+        }
+
+        [HttpGet("{commentId}")]
+        public ActionResult GetComment(int commentId)
+        {
+            if (commentService.Get(commentId) == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(commentService.Get(commentId));
+        }
+
+        [HttpPut("{commentId}/reactions")]
+        [Authorize]
+        public ActionResult PutReaction(int commentId, string reaction)
+        {
+            Comment comment;
+
+            if (commentService.Get(commentId) == null)
+            {
+                return NotFound("that comment doesnt exist");
+            }
+
+            comment = commentService.Get(commentId);
+
+            if (comment.reactions == null)
+            {
+                comment.reactions = new List<UserReaction>();
+            }
+
+            if (reactionService.Get(reaction) != null)
+            {
+                string username = HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value;
+
+                UserReaction userReaction = new UserReaction(username, reaction);
+
+                if (comment.reactions.Find(userReaction => userReaction.user == username && userReaction.reaction == reaction) == null)
+                {
+                    comment.reactions.Add(userReaction);
+                }
+                else
+                {
+                    comment.reactions.Remove(comment.reactions.Find(userReaction => userReaction.user == username && userReaction.reaction == reaction));
+                }
+
+                commentService.Update(commentId, comment);
+
+                return Accepted();
+            }
+
+            return NotFound("that reaction doesnt exist");
         }
     }
 }

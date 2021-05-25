@@ -1,24 +1,30 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 
-<header>
+<header id="header">
     <Navbar fixedPosition="@fixNavbar"/>
 </header>
 
 <div class="main">
     @if (fixNavbar)
     {
-        <div class="content p-0" style="padding: 0 !important;">
+        <div id="body" class="content" style="padding: 0 !important;">
             @Body
         </div>
     }
     else
     {
-        <div class="content px-4">
+        <div id="body" class="content px-4">
             @Body
         </div>
     }
 </div>
+
+<footer>
+    <Footer />
+</footer>
+
+<iframe src="/setBodyHeight.html" class="hidden" />
 
 @code {
     private bool fixNavbar { get; set; }

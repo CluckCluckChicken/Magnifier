@@ -9,11 +9,14 @@ namespace Magnifier.Models
 {
     public record Comment
     {
-        public Comment(int _commentId, ScratchComment _comment, List<int> _replies)
+        public Comment(int _commentId, ScratchComment _comment, bool _isReply, List<int> _replies)
         {
             commentId = _commentId;
             comment = _comment;
+            isReply = _isReply;
             replies = _replies;
+
+            reactions = new List<UserReaction>();
         }
 
         [BsonId]
@@ -27,6 +30,8 @@ namespace Magnifier.Models
         public List<UserReaction> reactions { get; set; }
 
         public bool isPinned { get; set; }
+
+        public bool isReply { get; set; }
 
         public List<int> replies { get; set; }
     }

@@ -25,6 +25,8 @@ namespace Spyglass
 
             builder.Services.AddScoped<AuthenticationService>();
 
+            builder.Services.AddScoped<ReactionService>();
+
             WebAssemblyHost host = builder.Build();
 
             AuthenticationService authenticationService = host.Services.GetRequiredService<AuthenticationService>();
