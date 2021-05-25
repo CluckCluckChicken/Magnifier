@@ -1,0 +1,87 @@
+﻿@page "/studios"
+@page "/studios/{studioId}"
+@using Magnifier.Models
+@using Services
+@using System.Net
+@using System.Net.Http
+@inject HttpClient Http
+@inject ReactionService ReactionService
+
+@if (string.IsNullOrEmpty(studioId))
+{
+    <p>enter a studio pls</p>
+}
+else
+{
+    if (hasInitialised)
+    {
+        <PageTitle Title="on Magnifier" />
+
+        <div class="flex flex-col justify-center items-center">
+            <iframe src="https://scratch.mit.edu/projects/@studioId/embed" allowtransparency="true" width="485" height="402" frameborder="0" scrolling="no" allowfullscreen></iframe>
+
+            @foreach (Magnifier.Models.Comment comment in comments)
+            {
+                if (!comment.isReply)
+                {
+                    <Comment projectId="@studioId" commentId="@comment.commentId.ToString()" comment="@comment" icon="@comment.comment.author.image" username="@comment.comment.author.username" content="@comment.comment.content" dateCreated="@comment.comment.datetime_created" replyIds="@comment.replies" />
+                }
+            }
+
+            @if (loadingMore)
+            {
+                <button class="transition duration-300 bg-primary hover:bg-primary active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3">Loading...</button>
+            }
+            else
+            {
+                <button @onclick="@LoadMore" class="transition duration-300 bg-primary hover:bg-primaryHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3">Load More</button>
+            }
+        </div>
+    }
+}
+
+@code {
+    private bool hasInitialised = false;
+
+    [Parameter]
+    public string studioId { get; set; }
+
+    public List<Magnifier.Models.Comment> comments { get; set; }
+
+    private int page = 1;
+
+    private bool loadingMore = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(studioId))
+        {
+            await ReactionService.Initialize();
+
+            comments = await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://localhost:5001/api/Comments/studios/{studioId}/1");
+
+            foreach (Magnifier.Models.Comment comment in comments)
+            {
+                comment.comment.content = WebUtility.HtmlDecode(comment.comment.content);
+            }
+        }
+
+        hasInitialised = true;
+    }
+
+    private async Task LoadMore()
+    {
+        loadingMore = true;
+
+        page++;
+
+        comments = comments.Concat(await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://localhost:5001/api/Comments/studios/{studioId}/{page}")).ToList();
+
+        foreach (Magnifier.Models.Comment comment in comments)
+        {
+            comment.comment.content = WebUtility.HtmlDecode(comment.comment.content);
+        }
+
+        loadingMore = false;
+    }
+}
