@@ -13,7 +13,9 @@ GET `https://localhost:5001/api/Auth/code`
 
 ### Example response
 
-Code: `200`
+#### Code:
+
+`200`
 
 #### Response body:
 
