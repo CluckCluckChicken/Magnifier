@@ -19,13 +19,13 @@ GET `https://localhost:5001/api/Auth/code`
 
 #### Response body:
 
-```json
+```
 ltdtroBzjjcdeWhHDCEOKYGbBWRlPQrjhhSE
 ```
 
 #### Response headers:
 
-```json
+```
  content-type: text/plain; charset=utf-8 
  date: Wed26 May 2021 21:23:55 GMT 
  server: Kestrel 
