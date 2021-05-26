@@ -41,7 +41,7 @@ ltdtroBzjjcdeWhHDCEOKYGbBWRlPQrjhhSE
 
 ## Get an authentication token using that code
 
-GET `https://localhost:5001/api/Auth/token?code={token}`
+GET `https://localhost:5001/api/Auth/token?code={code}`
 
 ### Example response
 
@@ -107,7 +107,7 @@ Authorization: Bearer {auth token}
 
 ## Get an already loaded comment using its commentId
 
-GET `https://localhost:5001/api/Auth/user`
+GET `https://localhost:5001/api/Comments/{commentId}`
 
 ### Example response
 
