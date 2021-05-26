@@ -3,6 +3,7 @@
 @inject AuthenticationService AuthenticationService
 @inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
 @inject HttpClient Http
+@inject IJSRuntime JsRuntime;
 
 @if (hasInitialised)
 {
@@ -76,13 +77,20 @@
 
     private async Task React(string reaction)
     {
-        count += hasReacted ? -1 : 1;
-        hasReacted = !hasReacted;
+        if (AuthenticationService.user == null)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "You need to sign in before you can react.");
+        }
+        else
+        {
+            count += hasReacted ? -1 : 1;
+            hasReacted = !hasReacted;
 
-        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"https://localhost:5001/api/Comments/{commentId}/reactions?reaction={reaction}");
-        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", LocalStorage.GetItem<string>("token"));
-        await Http.SendAsync(request);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"https://localhost:5001/api/Comments/{commentId}/reactions?reaction={reaction}");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", LocalStorage.GetItem<string>("token"));
+            await Http.SendAsync(request);
 
-        await GetReactions(true);
+            await GetReactions(true);
+        }
     }
 }

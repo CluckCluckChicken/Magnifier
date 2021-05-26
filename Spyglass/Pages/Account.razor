@@ -1,0 +1,26 @@
+﻿@page "/account"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<PageTitle Title="Magnifier Account" />
+
+<div class="px-4">
+    <Heading size="2">Account settings:</Heading>
+    <!--<EditForm Model="@projectQuery" OnValidSubmit="@ViewProjectComments">
+        <Heading size="3">Projects</Heading>
+        <InputText @bind-Value="@projectQuery.id" placeholder="Scratch project ID" class="transition duration-300 bg-white hover:bg-whiteHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3"></InputText>
+        <button type="submit" class="transition duration-300 bg-primary hover:bg-primaryHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3">View comments</button>
+        @if (!projectExists)
+        {
+            <Heading size="3"><span class="text-red">That project doesn't exist!</span></Heading>
+        }
+        <Heading size="3">@projectProgress</Heading>
+    </EditForm>-->
+</div>
+
+@code {
+    private async Task UpdateSettings()
+    {
+
+    }
+}
