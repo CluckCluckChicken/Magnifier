@@ -102,3 +102,57 @@ Authorization: Bearer {auth token}
  date: Wed26 May 2021 21:35:51 GMT 
  server: Kestrel 
 ```
+
+# Comments
+
+## Get an already loading comment using its commentId
+
+GET `https://localhost:5001/api/Auth/user`
+
+### Example response
+
+GET `https://localhost:5001/api/Comments/208427471`
+
+#### Request headers:
+
+```
+no extra headers needed.
+```
+
+#### Code:
+
+`200`
+
+#### Response body:
+
+```
+{
+  "_id": "60aec170fe30a66d65f62c1f",
+  "commentId": 208427471,
+  "comment": {
+    "_id": null,
+    "id": 208427471,
+    "content": "I purchase people then swallow them whole.",
+    "datetime_created": "2021-05-20T16:44:27Z",
+    "author": {
+      "_id": null,
+      "username": "Raihan142857",
+      "image": "https://cdn2.scratch.mit.edu/get_image/user/39403909_60x60.png"
+    }
+  },
+  "reactions": [],
+  "isPinned": false,
+  "isReply": false,
+  "replies": [
+    208433554
+  ]
+}
+```
+
+#### Response headers:
+
+```
+ content-type: application/json; charset=utf-8 
+ date: Wed26 May 2021 21:45:48 GMT 
+ server: Kestrel 
+```
