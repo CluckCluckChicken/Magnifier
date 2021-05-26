@@ -1,0 +1,30 @@
+﻿<PageTitle Title="Page not found | Magnifier" />
+
+<div class="px-4">
+    <Heading size="2">Page not found. Try:</Heading>
+    @switch (suggestion)
+    {
+        case 0:
+            <Heading size="3">yeeting your computer into space</Heading>
+            break;
+        case 1:
+            <Heading size="3">slapping a cruise missle with a wet fish then go up to the queen with a copy of The Extension&trade; and saying "good morning sir"</Heading>
+            break;
+        case 2:
+            <Heading size="3">finding the sus imposter 😳</Heading>
+            break;
+    }
+
+
+</div>
+
+@code {
+    private int suggestion;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Random random = new Random();
+
+        suggestion = random.Next(3);
+    }
+}

@@ -1,19 +1,26 @@
 ﻿@if (primary)
 {
-    <button class="transition duration-300 bg-primary hover:bg-primaryHover active:outline-none focus:outline-none text-white font-dosis text-4xl rounded-lg p-3 mt-3" style="width: 50vh;">
-        @ChildContent
-    </button>
+    <NavLink href="@href">
+        <button class="transition duration-300 bg-primary hover:bg-primaryHover active:outline-none focus:outline-none text-white font-dosis text-4xl rounded-lg p-3 mt-3" style="width: 50vh;">
+            @ChildContent
+        </button>
+    </NavLink>
 }
 else
 {
-    <button class="transition duration-300 bg-white hover:bg-whiteHover active:outline-none focus:outline-none text-midnight font-dosis text-4xl rounded-lg p-3 mt-3" style="width: 50vh;">
-        @ChildContent
-    </button>
+    <NavLink href="@href">
+        <button class="transition duration-300 bg-white hover:bg-whiteHover active:outline-none focus:outline-none text-midnight font-dosis text-4xl rounded-lg p-3 mt-3" style="width: 50vh;">
+            @ChildContent
+        </button>
+    </NavLink>
 }
 
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string href { get; set; }
 
     [Parameter]
     public bool primary { get; set; }
