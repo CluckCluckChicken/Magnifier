@@ -63,9 +63,12 @@
                     count++;
                 }
 
-                if (reaction.user == AuthenticationService.user.username && reaction.reaction == this.reaction.name)
+                if (AuthenticationService.user != null)
                 {
-                    hasReacted = true;
+                    if (reaction.user == AuthenticationService.user.username && reaction.reaction == this.reaction.name)
+                    {
+                        hasReacted = true;
+                    }
                 }
             }
         }

@@ -1,14 +1,14 @@
 ﻿@if (size == 1)
 {
-    <p class="text-6xl font-didactGothic">@ChildContent</p>
+    <p class="text-6xl text-@colour font-didactGothic">@ChildContent</p>
 }
 else if (size == 2)
 {
-    <p class="text-5xl font-didactGothic">@ChildContent</p>
+    <p class="text-5xl text-@colour font-didactGothic">@ChildContent</p>
 }
 else if (size == 3)
 {
-    <p class="text-4xl font-didactGothic">@ChildContent</p>
+    <p class="text-4xl text-@colour font-didactGothic">@ChildContent</p>
 }
 
 @code {
@@ -17,4 +17,7 @@ else if (size == 3)
 
     [Parameter]
     public int size { get; set; }
+
+    [Parameter]
+    public string colour { get; set; }
 }
