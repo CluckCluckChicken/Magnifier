@@ -3,6 +3,7 @@
 @inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
 @inject HttpClient Http
 @inject IJSRuntime JsRuntime;
+@inject NavigationManager NavigationManager
 
 <style>
     #comment-@commentId .showOnCommentHover {
@@ -36,7 +37,6 @@
                 <div id="right-buttons" class="flex flex-row showOnCommentHover">
                     <CommentButton onClick="@ViewOnScratch">View on Scratch</CommentButton>
                     <CommentButton onClick="@CopyLink">Copy Link</CommentButton>
-                    <CommentButton onClick="@Report">Report</CommentButton>
                 </div>
             </div>
         </div>
@@ -45,7 +45,7 @@
 
     @foreach (Magnifier.Models.Comment reply in replies)
     {
-        <Comment projectId="@projectId" commentId="@reply.commentId.ToString()" comment="@reply" icon="@reply.comment.author.image" username="@reply.comment.author.username" content="@reply.comment.content" dateCreated="@reply.comment.datetime_created" isTopLevel="false" replyIds="@emptyReplyList" />
+        <Comment location="@location" projectId="@projectId" commentId="@reply.commentId.ToString()" comment="@reply" icon="@reply.comment.author.image" username="@reply.comment.author.username" content="@reply.comment.content" dateCreated="@reply.comment.datetime_created" isTopLevel="false" replyIds="@emptyReplyList" />
     }
 }
 else
@@ -70,7 +70,6 @@ else
                 <div id="right-buttons" class="flex flex-row showOnCommentHover">
                     <CommentButton onClick="@ViewOnScratch">View on Scratch</CommentButton>
                     <CommentButton onClick="@CopyLink">Copy Link</CommentButton>
-                    <CommentButton onClick="@Report">Report</CommentButton>
                 </div>
             </div>
         </div>
@@ -86,6 +85,9 @@ else
     }
 
     private bool hasInitialised = false;
+
+    [Parameter]
+    public string location { get; set; }
 
     [Parameter]
     public string projectId { get; set; }
@@ -169,12 +171,26 @@ else
 
     public async Task ViewOnScratch()
     {
-        await JsRuntime.InvokeVoidAsync("alert", "View on Scratch");
+        if (location == "studios")
+        {
+            NavigationManager.NavigateTo($"https://scratch.mit.edu/{location}/{projectId}/comments/#comments-{commentId}");
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"https://scratch.mit.edu/{location}/{projectId}/#comments-{commentId}");
+        }
     }
 
     public async Task CopyLink()
     {
-        await JsRuntime.InvokeVoidAsync("alert", "Copy Link");
+        if (location == "studios")
+        {
+            await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", $"https://scratch.mit.edu/{location}/{projectId}/comments/#comments-{commentId}");
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", $"https://scratch.mit.edu/{location}/{projectId}/#comments-{commentId}");
+        }
     }
 
     public async Task Report()

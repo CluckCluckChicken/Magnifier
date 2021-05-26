@@ -17,14 +17,13 @@ else
     {
         <PageTitle Title="on Magnifier" />
 
-        <div class="flex flex-col justify-center items-center">
-            <iframe src="https://scratch.mit.edu/projects/@username/embed" allowtransparency="true" width="485" height="402" frameborder="0" scrolling="no" allowfullscreen></iframe>
+        <div class="flex flex-col justify-center items-center mt-8">
 
             @foreach (Magnifier.Models.Comment comment in comments)
             {
                 if (!comment.isReply)
                 {
-                    <Comment projectId="@username" commentId="@comment.commentId.ToString()" comment="@comment" icon="@comment.comment.author.image" username="@comment.comment.author.username" content="@comment.comment.content" dateCreated="@comment.comment.datetime_created" replyIds="@comment.replies" />
+                    <Comment location="users" projectId="@username" commentId="@comment.commentId.ToString()" comment="@comment" icon="@comment.comment.author.image" username="@comment.comment.author.username" content="@comment.comment.content" dateCreated="@comment.comment.datetime_created" replyIds="@comment.replies" />
                 }
             }
 
