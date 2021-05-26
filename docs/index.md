@@ -105,7 +105,7 @@ Authorization: Bearer {auth token}
 
 # Comments
 
-## Get an already loading comment using its commentId
+## Get an already loaded comment using its commentId
 
 GET `https://localhost:5001/api/Auth/user`
 
