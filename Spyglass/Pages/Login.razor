@@ -9,16 +9,18 @@
 
 <PageTitle Title="Magnifier" />
 
-<Heading size="2">Log in to Magnifier</Heading>
-<Heading size="3">Your auth code is:</Heading>
-<div>@authCode</div>
-<Heading size="3">Comment the code in the authentication Scratch project, then press "Done".</Heading>
-<Button onClick="@ShowAuthProject">Show Project</Button>
-<Button onClick="@CompleteAuth">Done</Button>
-@if (failed)
-{
-    <Heading size="3"><span class="text-red">Auth failed. Make sure that your comment contains just the code and nothing else.</span></Heading>
-}
+<div class="px-4">
+    <Heading size="2">Log in to Magnifier</Heading>
+    <Heading size="3">Your auth code is:</Heading>
+    <div>@authCode</div>
+    <Heading size="3">Comment the code in the authentication Scratch project, then press "Done".</Heading>
+    <Button onClick="@ShowAuthProject">Show Project</Button>
+    <Button onClick="@CompleteAuth">Done</Button>
+    @if (failed)
+    {
+        <Heading size="3"><span class="text-red">Auth failed. Make sure that your comment contains just the code and nothing else.</span></Heading>
+    }
+</div>
 
 @code {
     private string authCode { get; set; }
