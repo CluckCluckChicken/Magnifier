@@ -34,11 +34,12 @@ else
 
             @if (loadingMore)
             {
-                <button class="transition duration-300 bg-primary hover:bg-primary active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3">Loading...</button>
+                <!--<button class="transition duration-300 bg-primary hover:bg-primary active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3">Loading...</button>-->
+                <Loading />
             }
             else
             {
-                <button @onclick="@LoadMore" class="transition duration-300 bg-primary hover:bg-primaryHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3">Load More</button>
+                <Button onClick="@LoadMore">Load More</Button>
             }
         </div>
 
