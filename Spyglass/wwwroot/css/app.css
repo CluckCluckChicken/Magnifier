@@ -20275,6 +20275,11 @@ video {
           animation: bounce 1s infinite;
 }
 
+.animate-rotate {
+  -webkit-animation: spin 0.5s ease-in-out infinite;
+          animation: spin 0.5s ease-in-out infinite;
+}
+
 @font-face {
   font-family: 'Dosis';
 
@@ -39933,6 +39938,11 @@ video {
     -webkit-animation: bounce 1s infinite;
             animation: bounce 1s infinite;
   }
+
+  .sm\:animate-rotate {
+    -webkit-animation: spin 0.5s ease-in-out infinite;
+            animation: spin 0.5s ease-in-out infinite;
+  }
 }
 
 @media (min-width: 768px) {
@@ -59557,6 +59567,11 @@ video {
   .md\:animate-bounce {
     -webkit-animation: bounce 1s infinite;
             animation: bounce 1s infinite;
+  }
+
+  .md\:animate-rotate {
+    -webkit-animation: spin 0.5s ease-in-out infinite;
+            animation: spin 0.5s ease-in-out infinite;
   }
 }
 
@@ -79183,6 +79198,11 @@ video {
     -webkit-animation: bounce 1s infinite;
             animation: bounce 1s infinite;
   }
+
+  .lg\:animate-rotate {
+    -webkit-animation: spin 0.5s ease-in-out infinite;
+            animation: spin 0.5s ease-in-out infinite;
+  }
 }
 
 @media (min-width: 1280px) {
@@ -98807,5 +98827,10 @@ video {
   .xl\:animate-bounce {
     -webkit-animation: bounce 1s infinite;
             animation: bounce 1s infinite;
+  }
+
+  .xl\:animate-rotate {
+    -webkit-animation: spin 0.5s ease-in-out infinite;
+            animation: spin 0.5s ease-in-out infinite;
   }
 }

@@ -23,6 +23,9 @@ module.exports = {
               didactGothic: ["DidactGothic"],
           },
           outline: ['active'],
+          animation: {
+              rotate: 'spin 0.5s ease-in-out infinite',
+          }
       },
   },
   variants: {},
