@@ -28,6 +28,8 @@ namespace Magnifier.Models
 
         public bool isAdmin { get; set; } // Is this user an admin?
 
+        public bool isBanned { get; set; } // Is this user the sus imposter?
+
         public DateTime created { get; private set; } // When this user's account was created
         public DateTime lastLogin { get; private set; } // When this user last logged into their account
 
