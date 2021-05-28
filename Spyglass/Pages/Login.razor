@@ -43,12 +43,13 @@
 
         if (response.response.IsSuccessStatusCode)
         {
-
-            if (AuthenticationService.user.username == "46009361" || AuthenticationService.user.username == "Scunthorpe" || AuthenticationService.user.username == "mouse-pointer")
-            {
-                AuthenticationService.Logout();
-                await JSRuntime.InvokeVoidAsync("alert", "go away");
-            }
+            var blacklist = new List<string>{"46009361", "Scunthorpe", "mouse-pointer"};
+            foreach (string item in blacklist) {
+                if (AuthenticationService.user.username == item)
+                {
+                    AuthenticationService.Logout();
+                    await JSRuntime.InvokeVoidAsync("alert", "go away");
+                }
 
             NavigationManager.NavigateTo("/");
         }
