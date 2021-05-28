@@ -74,10 +74,18 @@ namespace Magnifier.Models
                     {
                         if (comment.content == code)
                         {
+
                             authCodeService.Update(code, new AuthCode(code, true));
                             if (userService.Get(comment.author.username) == null)
                             {
                                 userService.Create(new User(comment.author.username, comment.author, comment.author.username == "potatophant"));
+                            }
+                            else
+                            {
+                                if (userService.Get(comment.author.username).isBanned)
+                                {
+                                    return Forbid();
+                                }
                             }
                             token = jwtAuthService.GenerateJwt(code, comment.author.username, comment.author.username == "potatophant");
                         }
@@ -102,6 +110,11 @@ namespace Magnifier.Models
         public ActionResult GetUser()
         {
             User user = userService.Get(HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value);
+
+            if (user.isBanned)
+            {
+                return Forbid();
+            }
 
             if (user != null)
             {

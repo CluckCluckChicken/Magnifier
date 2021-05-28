@@ -13,14 +13,18 @@ namespace Magnifier.Services
     public class JwtAuthService
     {
         private readonly IJwtAuthSettings auth;
+        private readonly UserService userService;
 
-        public JwtAuthService(IJwtAuthSettings _auth)
+        public JwtAuthService(IJwtAuthSettings _auth, UserService _userService)
         {
             auth = _auth;
+            userService = _userService;
         }
 
         public string GenerateJwt(string code, string username, bool isAdmin = false)
         {
+            // this doesnt check if user is banned. you will need to check that beforehand.
+
             string privateKey = auth.PrivateKey;
             string issuer = auth.Issuer;
             string audience = auth.Audience;

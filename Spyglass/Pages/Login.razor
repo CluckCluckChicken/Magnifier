@@ -20,12 +20,18 @@
     {
         <Heading size="3"><span class="text-red">Auth failed. Make sure that your comment contains just the code and nothing else.</span></Heading>
     }
+    @if (banned)
+    {
+        <Heading size="3"><span class="text-red">You are banned from Magnifier. Not very poggers.</span></Heading>
+    }
 </div>
 
 @code {
     private string authCode { get; set; }
 
     private bool failed { get; set; }
+
+    private bool banned { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,6 +59,15 @@
             NavigationManager.NavigateTo("/");
         }
 
-        failed = true;
+        string responseMessage = await response.response.Content.ReadAsStringAsync();
+
+        if (response.response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+        {
+            banned = true;
+        }
+        else
+        {
+            failed = true;
+        }
     }
 }

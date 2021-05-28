@@ -20,12 +20,15 @@ namespace Magnifier.Controllers
     {
         private readonly CommentService commentService;
         private readonly ReactionService reactionService;
+        private readonly UserService userService;
         private readonly HttpClient client;
 
-        public CommentsController(CommentService _commentService, ReactionService _reactionService)
+        public CommentsController(CommentService _commentService, ReactionService _reactionService, UserService _userService)
         {
             commentService = _commentService;
             reactionService = _reactionService;
+            userService = _userService;
+
             client = new HttpClient();
         }
 
@@ -634,6 +637,13 @@ namespace Magnifier.Controllers
         [Authorize]
         public ActionResult PutReaction(int commentId, string reaction)
         {
+            User user = userService.Get(HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value);
+
+            if (user.isBanned)
+            {
+                return Forbid();
+            }
+
             Comment comment;
 
             if (commentService.Get(commentId) == null)
