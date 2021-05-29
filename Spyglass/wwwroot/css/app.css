@@ -2719,7 +2719,7 @@ video {
   background-color: rgba(112, 36, 89, var(--bg-opacity));
 }
 
-.hover\:bg-whiteHover:hover {
+.hover\:bg-whiteHover:hover:not(:focus) {
   --bg-opacity: 1;
   background-color: #bdc3c7;
   background-color: rgba(189, 195, 199, var(--bg-opacity));
