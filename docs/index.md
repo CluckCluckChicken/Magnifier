@@ -9,11 +9,11 @@ You can use the Magnifier API to get/put reactions, pins, comments, etc.
 
 ## Get an authentication code for use
 
-GET `https://localhost:5001/api/Auth/code`
+GET `/api/Auth/code`
 
 ### Example response
 
-GET `https://localhost:5001/api/Auth/code`
+GET `/api/Auth/code`
 
 #### Request headers:
 
@@ -41,11 +41,11 @@ ltdtroBzjjcdeWhHDCEOKYGbBWRlPQrjhhSE
 
 ## Get an authentication token using that code
 
-GET `https://localhost:5001/api/Auth/token?code={code}`
+GET `/api/Auth/token?code={code}`
 
 ### Example response
 
-GET `https://localhost:5001/api/Auth/token?code=ltdtroBzjjcdeWhHDCEOKYGbBWRlPQrjhhSE`
+GET `/api/Auth/token?code=ltdtroBzjjcdeWhHDCEOKYGbBWRlPQrjhhSE`
 
 #### Request headers:
 
@@ -73,11 +73,11 @@ im not telling you my auth token mate, but it'll be a base64 encoded JWT token, 
 
 ## Get a user using an auth token
 
-GET `https://localhost:5001/api/Auth/user`
+GET `/api/Auth/user`
 
 ### Example response
 
-GET `https://localhost:5001/api/Auth/user`
+GET `/api/Auth/user`
 
 #### Request headers:
 
@@ -107,11 +107,11 @@ Authorization: Bearer {auth token}
 
 ## Get an already loaded comment using its commentId
 
-GET `https://localhost:5001/api/Comments/{commentId}`
+GET `/api/Comments/{commentId}`
 
 ### Example response
 
-GET `https://localhost:5001/api/Comments/208427471`
+GET `/api/Comments/208427471`
 
 #### Request headers:
 
