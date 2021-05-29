@@ -79,6 +79,11 @@ namespace Magnifier.Models
 
                             User user = userService.Get(comment.author.username);
 
+                            if (jwtAuthService.GetBannedUsers().Contains(comment.author.username))
+                            {
+                                return Forbid();
+                            }
+
                             if (user == null)
                             {
                                 user = userService.Create(new User(comment.author.username, comment.author, comment.author.username == "potatophant"));

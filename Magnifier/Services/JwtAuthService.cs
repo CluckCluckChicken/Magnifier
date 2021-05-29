@@ -47,5 +47,10 @@ namespace Magnifier.Services
 
             return jwt;
         }
+
+        public string[] GetBannedUsers()
+        {
+            return new string[] { "dlpenguin4" };
+        }
     }
 }
