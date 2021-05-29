@@ -2,7 +2,7 @@
 Scratch comment reactions
 
 ## Instructions
-The Magnifier backend is a C# ASP.NET Core Web API located in `Magnifier`.  
+The Magnifier backend consists of a C# ASP.NET Core Web API located in `Magnifier`.  
 Spyglass, the frontend, is a C# ASP.NET Core Blazor WASM app located in `Spyglass`.
 
 ## Config
@@ -39,15 +39,26 @@ You also need a private key and a MongoDB instance.
 
 To run the Magnifier backend, just open in Visual Studio, select "Magnifier" from the project select dropdown and from the build type select dropdown. A MongoDB instance and a private key are required. The backend also supports Docker, so you can run it in Docker if you want.
 
-To run the Spyglass frontend, open `Spyglass` in a terminal window then use `npm install`, `gulp css` and then `dotnet watch -p Spyglass.csproj run` to run and watch.
+To run the Spyglass frontend, open `Spyglass` in a terminal window then run:
 
+```bash
+npm install
+
+gulp css
+
+dotnet watch -p Spyglass.csproj run
+```
+to run and watch changes.
 ## Spyglass stylesheet
 **DO NOT** modify `Spyglass/wwwroot/css/app.css`. This file is generated when you run `gulp css`. Instead, modify `Spyglass/Styles/app.css`.
 
-## What stuff does
-### Backend
-`Magnifier/Controllers` contains classes with endpoints.  
-`Magnifier/Models` contains classes to be used to store data.  
-`Magnifier/Services` contains singleton classes that can be used to access data and to do stuff.  
+## Stuff Explained
+
 ### Frontend (Spyglass)
 idk lol
+
+### Backend (Magnifier)
+`Magnifier/Controllers` contains classes with endpoints.  
+`Magnifier/Models` contains classes to be used to store data.  
+`Magnifier/Services` contains singleton classes that can be used to access data and to do stuff.
+You can see the REST API Docs for Magnifier [here](https://CluckCluckChicken.github.io/Magnifier).
