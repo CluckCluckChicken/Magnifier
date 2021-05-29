@@ -8,12 +8,13 @@ namespace Magnifier.Models
 {
     public record User
     {
-        public User(string username, ScratchCommentAuthor scratchUser, bool isAdmin)
+        public User(string username, ScratchCommentAuthor scratchUser, bool isAdmin, DateTime created, DateTime lastLogin)
         {
             this.username = username;
             this.scratchUser = scratchUser;
             this.isAdmin = isAdmin;
-            created = DateTime.Now;
+            this.created = created;
+            this.lastLogin = lastLogin;
         }
 
         public string id { get; set; }
@@ -24,8 +25,8 @@ namespace Magnifier.Models
 
         public bool isAdmin { get; set; } // Is this user an admin?
 
-        public DateTime created { get; private set; } // When this user's account was created
-        public DateTime lastLogin { get; private set; } // When this user last logged into their account
+        public DateTime created { get; set; } // When this user's account was created
+        public DateTime lastLogin { get; set; } // When this user last logged into their account
 
         public List<UserIPAddress> ipAddresses { get; set; } // The IP addresses this user has logged in with
     }

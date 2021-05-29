@@ -15,7 +15,10 @@ namespace Magnifier.Models
             username = _username;
             scratchUser = _scratchUser;
             isAdmin = _isAdmin;
+
             created = DateTime.Now;
+
+            ipAddresses = new List<UserIPAddress>();
         }
 
         [BsonId]
