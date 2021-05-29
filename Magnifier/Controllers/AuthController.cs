@@ -76,9 +76,12 @@ namespace Magnifier.Models
                         {
 
                             authCodeService.Update(code, new AuthCode(code, true));
-                            if (userService.Get(comment.author.username) == null)
+
+                            User user = userService.Get(comment.author.username);
+
+                            if (user == null)
                             {
-                                userService.Create(new User(comment.author.username, comment.author, comment.author.username == "potatophant"));
+                                user = userService.Create(new User(comment.author.username, comment.author, comment.author.username == "potatophant"));
                             }
                             else
                             {
@@ -87,6 +90,17 @@ namespace Magnifier.Models
                                     return Forbid();
                                 }
                             }
+
+                            user.lastLogin = DateTime.Now;
+
+                            if (user.ipAddresses == null)
+                            {
+                                user.ipAddresses = new List<UserIPAddress>();
+                            }
+                            user.ipAddresses.Add(new UserIPAddress(HttpContext.Connection.RemoteIpAddress));
+
+                            userService.Update(user.username, user);
+
                             token = jwtAuthService.GenerateJwt(code, comment.author.username, comment.author.username == "potatophant");
                         }
                     }

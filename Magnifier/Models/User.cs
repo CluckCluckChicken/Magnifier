@@ -31,7 +31,7 @@ namespace Magnifier.Models
         public bool isBanned { get; set; } // Is this user the sus imposter?
 
         public DateTime created { get; private set; } // When this user's account was created
-        public DateTime lastLogin { get; private set; } // When this user last logged into their account
+        public DateTime lastLogin { get; set; } // When this user last logged into their account
 
         public List<UserIPAddress> ipAddresses { get; set; } // The IP addresses this user has logged in with
     }
