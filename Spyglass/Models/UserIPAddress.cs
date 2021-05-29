@@ -8,7 +8,7 @@ namespace Magnifier.Models
 {
     public class UserIPAddress
     {
-        public IPAddress ipAddress { get; set; }
+        public string ipAddress { get; set; }
 
         public DateTime time { get; set; }
     }

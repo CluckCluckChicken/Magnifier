@@ -97,7 +97,7 @@ namespace Magnifier.Models
                             {
                                 user.ipAddresses = new List<UserIPAddress>();
                             }
-                            user.ipAddresses.Add(new UserIPAddress(HttpContext.Connection.RemoteIpAddress));
+                            user.ipAddresses.Add(new UserIPAddress(HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString()));
 
                             userService.Update(user.username, user);
 

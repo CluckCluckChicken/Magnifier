@@ -8,14 +8,14 @@ namespace Magnifier.Models
 {
     public class UserIPAddress
     {
-        public UserIPAddress(IPAddress _ipAddress)
+        public UserIPAddress(string _ipAddress)
         {
             ipAddress = _ipAddress;
 
             time = DateTime.Now;
         }
 
-        public IPAddress ipAddress { get; set; }
+        public string ipAddress { get; set; }
 
         public DateTime time { get; set; }
     }
