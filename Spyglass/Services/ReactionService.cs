@@ -23,7 +23,7 @@ namespace Spyglass.Services
 
         public async Task Initialize()
         {
-            reactions = await Http.GetFromJsonAsync<List<Reaction>>($"https://localhost:5001/api/Reactions");
+            reactions = await Http.GetFromJsonAsync<List<Reaction>>($"https://api.magnifier.potatophant.net/api/Reactions");
         }
     }
 }

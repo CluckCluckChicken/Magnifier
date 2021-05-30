@@ -65,7 +65,7 @@ else
         {
             await ReactionService.Initialize();
 
-            comments = await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://localhost:5001/api/Comments/users/{username}/1");
+            comments = await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://api.magnifier.potatophant.net/api/Comments/users/{username}/1");
 
             foreach (Magnifier.Models.Comment comment in comments)
             {
@@ -82,7 +82,7 @@ else
 
         page++;
 
-        comments = comments.Concat(await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://localhost:5001/api/Comments/users/{username}/{page}")).ToList();
+        comments = comments.Concat(await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://api.magnifier.potatophant.net/api/Comments/users/{username}/{page}")).ToList();
 
         foreach (Magnifier.Models.Comment comment in comments)
         {

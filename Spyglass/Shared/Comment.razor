@@ -130,7 +130,7 @@ else
         {
             Magnifier.Models.Comment reply;
 
-            reply = await Http.GetFromJsonAsync<Magnifier.Models.Comment>($"https://localhost:5001/api/Comments/{replyId}");
+            reply = await Http.GetFromJsonAsync<Magnifier.Models.Comment>($"https://api.magnifier.potatophant.net/api/Comments/{replyId}");
 
             reply.comment.content = WebUtility.HtmlDecode(reply.comment.content);
 

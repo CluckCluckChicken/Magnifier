@@ -54,7 +54,7 @@
     private async Task ViewProjectComments()
     {
         projectProgress = "Checking if project exists...";
-        var project = await Http.GetAsync($"https://localhost:5001/api/Comments/projects/{projectQuery.id}/exists");
+        var project = await Http.GetAsync($"https://api.magnifier.potatophant.net/api/Comments/projects/{projectQuery.id}/exists");
         if (project.StatusCode != System.Net.HttpStatusCode.OK || projectQuery.id == "")
         {
             projectExists = false;
@@ -70,7 +70,7 @@
     private async Task ViewProfileComments()
     {
         profileProgress = "Checking if user exists...";
-        var project = await Http.GetAsync($"https://localhost:5001/api/Comments/users/{profileQuery.id}/exists");
+        var project = await Http.GetAsync($"https://api.magnifier.potatophant.net/api/Comments/users/{profileQuery.id}/exists");
         if (project.StatusCode != System.Net.HttpStatusCode.OK || profileQuery.id == "")
         {
             profileExists = false;
@@ -86,7 +86,7 @@
     private async Task ViewStudioComments()
     {
         studioProgress = "Checking if studio exists...";
-        var project = await Http.GetAsync($"https://localhost:5001/api/Comments/studios/{studioQuery.id}/exists");
+        var project = await Http.GetAsync($"https://api.magnifier.potatophant.net/api/Comments/studios/{studioQuery.id}/exists");
         if (project.StatusCode != System.Net.HttpStatusCode.OK || studioQuery.id == "")
         {
             studioExists = false;

@@ -35,7 +35,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        authCode = await Http.GetStringAsync($"https://localhost:5001/api/Auth/code");
+        authCode = await Http.GetStringAsync($"https://api.magnifier.potatophant.net/api/Auth/code");
     }
 
     private async Task ShowAuthProject()
