@@ -17,8 +17,6 @@ namespace Magnifier.Models
             isAdmin = _isAdmin;
 
             created = DateTime.Now;
-
-            ipAddresses = new List<UserIPAddress>();
         }
 
         [BsonId]
@@ -35,7 +33,5 @@ namespace Magnifier.Models
 
         public DateTime created { get; private set; } // When this user's account was created
         public DateTime lastLogin { get; set; } // When this user last logged into their account
-
-        public List<UserIPAddress> ipAddresses { get; set; } // The IP addresses this user has logged in with
     }
 }

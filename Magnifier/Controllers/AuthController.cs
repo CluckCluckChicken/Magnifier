@@ -98,12 +98,6 @@ namespace Magnifier.Models
 
                             user.lastLogin = DateTime.Now;
 
-                            if (user.ipAddresses == null)
-                            {
-                                user.ipAddresses = new List<UserIPAddress>();
-                            }
-                            user.ipAddresses.Add(new UserIPAddress(HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString()));
-
                             userService.Update(user.username, user);
 
                             token = jwtAuthService.GenerateJwt(code, comment.author.username, comment.author.username == "potatophant");
