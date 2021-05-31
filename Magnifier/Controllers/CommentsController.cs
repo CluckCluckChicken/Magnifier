@@ -463,11 +463,13 @@ namespace Magnifier.Controllers
             {
                 if (dbComments.Find(dbComment => dbComment.commentId == comment.commentId) == null)
                 {
-                    commentService.Create(comment);
+                    dbComments.Add(comment);
+                    new Thread(() =>
+                    {
+                        commentService.Create(comment);
+                    }).Start();
                 }
             }
-
-            dbComments = commentService.Get();
 
             List<Comment> matchingComments = commentService.Get().FindAll(comment => comments.Find(comment2 => comment2.commentId == comment.commentId) != null);
 
@@ -481,7 +483,7 @@ namespace Magnifier.Controllers
         }
 
         [HttpGet("studios/{studioId}/{page}")]
-        public async Task<ActionResult> GetUserCommentsAsync(int studioId, int page)
+        public async Task<ActionResult> GetStudioCommentsAsync(int studioId, int page)
         {
             string response;
 
@@ -531,11 +533,13 @@ namespace Magnifier.Controllers
             {
                 if (dbComments.Find(dbComment => dbComment.commentId == comment.commentId) == null)
                 {
-                    commentService.Create(comment);
+                    dbComments.Add(comment);
+                    new Thread(() =>
+                    {
+                        commentService.Create(comment);
+                    }).Start();
                 }
             }
-
-            dbComments = commentService.Get();
 
             List<Comment> matchingComments = commentService.Get().FindAll(comment => comments.Find(comment2 => comment2.commentId == comment.commentId) != null);
 
