@@ -21,6 +21,7 @@ namespace Magnifier.Models
 
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [BsonIgnoreIfDefault]
         public string _id { get; set; }
 
         public int commentId { get; set; }

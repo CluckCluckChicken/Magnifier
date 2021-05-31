@@ -35,7 +35,7 @@ namespace Magnifier.Services
         }
 
         public void Update(int commentId, Comment commentIn) =>
-            comments.ReplaceOne(comment => comment.commentId == commentId, commentIn);
+            comments.FindOneAndReplace(comment => comment.commentId == commentId, commentIn);
 
         public void Remove(Comment commentIn) =>
             comments.DeleteOne(comment => comment._id == commentIn._id);

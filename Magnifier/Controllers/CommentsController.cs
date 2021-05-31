@@ -428,7 +428,14 @@ namespace Magnifier.Controllers
 
             try
             {
-                response = await client.GetStringAsync($"https://scratch.mit.edu/site-api/comments/user/{username}?page={page}");
+                if (page == 1)
+                {
+                    response = await client.GetStringAsync($"https://scratch.mit.edu/site-api/comments/user/{username}");
+                }
+                else
+                {
+                    response = await client.GetStringAsync($"https://scratch.mit.edu/site-api/comments/user/{username}?page={page}");
+                }
             }
             catch
             {
@@ -461,21 +468,34 @@ namespace Magnifier.Controllers
                             HtmlNode replyContainerInfo = replyContainer.SelectSingleNode(".//div[@class=\"info\"]");
                             HtmlNode replyContainerUser = replyContainer.SelectSingleNode(".//a[@id=\"comment-user\"]");
                             ScratchCommentAuthor replyContainerUserAuthor = new ScratchCommentAuthor(replyContainerInfo.SelectSingleNode(".//div[@class=\"name\"]").InnerText.Trim(), replyContainerUser.SelectSingleNode(".//img[@class=\"avatar\"]").Attributes["src"].Value);
-                            ScratchComment replyContainerUserScratchComment /* :) */ = new ScratchComment(int.Parse(replyContainer.SelectSingleNode(".//div[@class=\"comment \"]").Attributes["data-comment-id"].Value), replyContainerInfo.SelectSingleNode(".//div[@class=\"content\"]").InnerText.Trim().Replace("\n      ", ""), author, DateTime.Parse(replyContainerInfo.SelectSingleNode(".//span[@class=\"time\"]").Attributes["title"].Value));
+                            ScratchComment replyContainerUserScratchComment /* :) */ = new ScratchComment(int.Parse(replyContainer.SelectSingleNode(".//div[@class=\"comment \"]").Attributes["data-comment-id"].Value), replyContainerInfo.SelectSingleNode(".//div[@class=\"content\"]").InnerText.Trim().Replace("\n      ", ""), replyContainerUserAuthor, DateTime.Parse(replyContainerInfo.SelectSingleNode(".//span[@class=\"time\"]").Attributes["title"].Value));
 
-                            Comment c = commentService.Get(replyContainerUserScratchComment.id);
+                            Comment r = commentService.Get(replyContainerUserScratchComment.id);
 
-                            if (c == null)
+                            if (r == null)
                             {
-                                c = new Comment(replyContainerUserScratchComment.id, replyContainerUserScratchComment, true, new List<Comment>());
+                                r = new Comment(replyContainerUserScratchComment.id, replyContainerUserScratchComment, true, new List<Comment>());
                             }
 
-                            replies.Add(c);
+                            replies.Add(r);
+
+                            comments.Add(r);
                         }
                     }
-                }
 
-                comments.Add(new Comment(scratchComment.id, scratchComment, node.ParentNode.HasClass("reply"), replies));
+                    Comment c = commentService.Get(scratchComment.id);
+
+                    if (c == null)
+                    {
+                        c = new Comment(scratchComment.id, scratchComment, false, replies);
+                    }
+                    else
+                    {
+                        c.replies = replies;
+                    }
+
+                    comments.Add(c);
+                }                
             }
 
             List<Comment> dbComments = commentService.Get();
@@ -489,6 +509,17 @@ namespace Magnifier.Controllers
                     {
                         commentService.Create(comment);
                     }).Start();
+                }
+                else
+                {
+                    if (!comment.isReply)
+                    {
+                        dbComments[dbComments.FindIndex(dbComment => dbComment.commentId == comment.commentId)] = comment;
+                        new Thread(() =>
+                        {
+                            commentService.Update(comment.commentId, comment);
+                        }).Start();
+                    }
                 }
             }
 
@@ -510,7 +541,14 @@ namespace Magnifier.Controllers
 
             try
             {
-                response = await client.GetStringAsync($"https://scratch.mit.edu/site-api/comments/gallery/{studioId}?page={page}");
+                if (page == 1)
+                {
+                    response = await client.GetStringAsync($"https://scratch.mit.edu/site-api/comments/gallery/{studioId}");
+                }
+                else
+                {
+                    response = await client.GetStringAsync($"https://scratch.mit.edu/site-api/comments/gallery/{studioId}?page={page}");
+                }
             }
             catch
             {
@@ -543,21 +581,36 @@ namespace Magnifier.Controllers
                             HtmlNode replyContainerInfo = replyContainer.SelectSingleNode(".//div[@class=\"info\"]");
                             HtmlNode replyContainerUser = replyContainer.SelectSingleNode(".//a[@id=\"comment-user\"]");
                             ScratchCommentAuthor replyContainerUserAuthor = new ScratchCommentAuthor(replyContainerInfo.SelectSingleNode(".//div[@class=\"name\"]").InnerText.Trim(), replyContainerUser.SelectSingleNode(".//img[@class=\"avatar\"]").Attributes["src"].Value);
-                            ScratchComment replyContainerUserScratchComment /* :) */ = new ScratchComment(int.Parse(replyContainer.SelectSingleNode(".//div[@class=\"comment \"]").Attributes["data-comment-id"].Value), replyContainerInfo.SelectSingleNode(".//div[@class=\"content\"]").InnerText.Trim().Replace("\n      ", ""), author, DateTime.Parse(replyContainerInfo.SelectSingleNode(".//span[@class=\"time\"]").Attributes["title"].Value));
+                            ScratchComment replyContainerUserScratchComment /* :) */ = new ScratchComment(int.Parse(replyContainer.SelectSingleNode(".//div[@class=\"comment \"]").Attributes["data-comment-id"].Value), replyContainerInfo.SelectSingleNode(".//div[@class=\"content\"]").InnerText.Trim().Replace("\n      ", ""), replyContainerUserAuthor, DateTime.Parse(replyContainerInfo.SelectSingleNode(".//span[@class=\"time\"]").Attributes["title"].Value));
 
-                            Comment c = commentService.Get(replyContainerUserScratchComment.id);
+                            Comment r = commentService.Get(replyContainerUserScratchComment.id);
 
-                            if (c == null)
+                            if (r == null)
                             {
-                                c = new Comment(replyContainerUserScratchComment.id, replyContainerUserScratchComment, true, new List<Comment>());
+                                r = new Comment(replyContainerUserScratchComment.id, replyContainerUserScratchComment, true, new List<Comment>());
                             }
 
-                            replies.Add(c);
+                            replies.Add(r);
+
+                            comments.Add(r);
                         }
                     }
+
+                    comments.Add(new Comment(scratchComment.id, scratchComment, false, replies));
                 }
 
-                comments.Add(new Comment(scratchComment.id, scratchComment, node.ParentNode.HasClass("reply"), replies));
+                Comment c = commentService.Get(scratchComment.id);
+
+                if (c == null)
+                {
+                    c = new Comment(scratchComment.id, scratchComment, false, replies);
+                }
+                else
+                {
+                    c.replies = replies;
+                }
+
+                comments.Add(c);
             }
 
             List<Comment> dbComments = commentService.Get();
@@ -571,6 +624,17 @@ namespace Magnifier.Controllers
                     {
                         commentService.Create(comment);
                     }).Start();
+                }
+                else
+                {
+                    if (!comment.isReply)
+                    {
+                        dbComments[dbComments.FindIndex(dbComment => dbComment.commentId == comment.commentId)] = comment;
+                        new Thread(() =>
+                        {
+                            commentService.Update(comment.commentId, comment);
+                        }).Start();
+                    }
                 }
             }
 
