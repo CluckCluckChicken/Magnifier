@@ -450,6 +450,11 @@ namespace Magnifier.Controllers
 
             List<Comment> comments = new List<Comment>();
 
+            if (commentNodes == null)
+            {
+                return Ok(JsonConvert.SerializeObject(new List<Comment>()));
+            }
+
             foreach (HtmlNode node in commentNodes)
             {
                 HtmlNode info = node.SelectSingleNode(".//div[@class=\"info\"]");
@@ -562,6 +567,11 @@ namespace Magnifier.Controllers
             HtmlNodeCollection commentNodes = html.DocumentNode.SelectNodes("//div[@class=\"comment \"]");
 
             List<Comment> comments = new List<Comment>();
+
+            if (commentNodes == null)
+            {
+                return Ok(JsonConvert.SerializeObject(new List<Comment>()));
+            }
 
             foreach (HtmlNode node in commentNodes)
             {
