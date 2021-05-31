@@ -471,7 +471,7 @@ namespace Magnifier.Controllers
                 }
             }
 
-            List<Comment> matchingComments = commentService.Get().FindAll(comment => comments.Find(comment2 => comment2.commentId == comment.commentId) != null);
+            List<Comment> matchingComments = dbComments.FindAll(comment => comments.Find(comment2 => comment2.commentId == comment.commentId) != null);
 
             matchingComments = matchingComments
                 .Where(p => p.comment.datetime_created.HasValue)
@@ -541,7 +541,7 @@ namespace Magnifier.Controllers
                 }
             }
 
-            List<Comment> matchingComments = commentService.Get().FindAll(comment => comments.Find(comment2 => comment2.commentId == comment.commentId) != null);
+            List<Comment> matchingComments = dbComments.FindAll(comment => comments.Find(comment2 => comment2.commentId == comment.commentId) != null);
 
             matchingComments = matchingComments
                 .Where(p => p.comment.datetime_created.HasValue)
