@@ -9,7 +9,7 @@ namespace Magnifier.Models
 {
     public class ScratchRequestResponse
     {
-        public ScratchRequestResponse(HttpResponseMessage _response, ScratchProject _project = null, ScratchComment _comment = null, List<int> _comments = null)
+        public ScratchRequestResponse(HttpResponseMessage _response, ScratchProject _project = null, ScratchComment _comment = null, List<Comment> _comments = null)
         {
             response = _response;
             statusCode = _response.StatusCode;
@@ -26,6 +26,6 @@ namespace Magnifier.Models
 
         public ScratchProject project;
         public ScratchComment comment;
-        public List<int> comments;
+        public List<Comment> comments;
     }
 }

@@ -7,7 +7,7 @@ namespace Magnifier.Models
 {
     public record Comment
     {
-        public Comment(int commentId, ScratchComment comment, bool isReply, List<int> replies)
+        public Comment(int commentId, ScratchComment comment, bool isReply, List<Magnifier.Models.Comment> replies)
         {
             this.commentId = commentId;
             this.comment = comment;
@@ -29,6 +29,6 @@ namespace Magnifier.Models
 
         public bool isReply { get; set; }
 
-        public List<int> replies { get; set; }
+        public List<Magnifier.Models.Comment> replies { get; set; }
     }
 }

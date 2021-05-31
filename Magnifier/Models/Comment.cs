@@ -9,7 +9,7 @@ namespace Magnifier.Models
 {
     public record Comment
     {
-        public Comment(int _commentId, ScratchComment _comment, bool _isReply, List<int> _replies)
+        public Comment(int _commentId, ScratchComment _comment, bool _isReply, List<Comment> _replies)
         {
             commentId = _commentId;
             comment = _comment;
@@ -33,6 +33,6 @@ namespace Magnifier.Models
 
         public bool isReply { get; set; }
 
-        public List<int> replies { get; set; }
+        public List<Comment> replies { get; set; }
     }
 }

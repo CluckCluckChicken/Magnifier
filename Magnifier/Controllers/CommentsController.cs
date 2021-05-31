@@ -98,11 +98,18 @@ namespace Magnifier.Controllers
 
             var data = await response.Content.ReadAsStringAsync();
 
-            List<int> replies = new List<int>();
+            List<Comment> replies = new List<Comment>();
 
             foreach (ScratchComment comment in JsonConvert.DeserializeObject<List<ScratchComment>>(data))
             {
-                replies.Add(comment.id);
+                Comment c = commentService.Get(comment.id);
+
+                if (c == null)
+                {
+                    c = commentService.Create(new Comment(comment.id, comment, true, new List<Comment>()));
+                }
+
+                replies.Add(c);
             }
 
             return new ScratchRequestResponse(response, _comments: replies);
@@ -307,21 +314,22 @@ namespace Magnifier.Controllers
                     return NotFound(requestResponse.statusCode.ToString());
                 }
 
-                var scratchCommentReplies = requestResponse.comments;
+                List<Comment> scratchCommentReplies = requestResponse.comments;
 
-                List<int> replies = new List<int>();
+                List<Comment> replies = new List<Comment>();
 
-                foreach (int scratchComment in scratchCommentReplies)
+                foreach (Comment scratchComment in scratchCommentReplies)
                 {
-                    if (dbComments.Find(comment => comment.commentId == scratchComment) == null)
+                    if (dbComments.Find(comment => comment.commentId == scratchComment.commentId) == null)
                     {
-                        ScratchRequestResponse imrunningoutofvariablenames = await GetScratchComment(projectId, scratchComment);
+                        ScratchRequestResponse imrunningoutofvariablenames = await GetScratchComment(projectId, scratchComment.commentId);
 
                         new Thread(() =>
                         {
-                            commentService.Create(new Comment(scratchComment, imrunningoutofvariablenames.comment, true, new List<int>()));
+                            commentService.Create(new Comment(scratchComment.commentId, imrunningoutofvariablenames.comment, true, new List<Comment>()));
                         }).Start();
                     }
+
                     replies.Add(scratchComment);
                 }
 
@@ -441,7 +449,7 @@ namespace Magnifier.Controllers
                 ScratchCommentAuthor author = new ScratchCommentAuthor(info.SelectSingleNode(".//div[@class=\"name\"]").InnerText.Trim(), user.SelectSingleNode(".//img[@class=\"avatar\"]").Attributes["src"].Value);
                 ScratchComment scratchComment = new ScratchComment(int.Parse(node.Attributes["data-comment-id"].Value), info.SelectSingleNode(".//div[@class=\"content\"]").InnerText.Trim().Replace("\n      ", ""), author, DateTime.Parse(info.SelectSingleNode(".//span[@class=\"time\"]").Attributes["title"].Value));
 
-                List<int> replies = new List<int>();
+                List<Comment> replies = new List<Comment>();
 
                 if (!node.ParentNode.HasClass("reply"))
                 {
@@ -449,7 +457,12 @@ namespace Magnifier.Controllers
                     {
                         if (replyContainer.SelectSingleNode(".//div[@class=\"comment \"]") != null)
                         {
-                            replies.Add(int.Parse(replyContainer.SelectSingleNode(".//div[@class=\"comment \"]").Attributes["data-comment-id"].Value));
+                            HtmlNode replyContainerInfo = replyContainer.SelectSingleNode(".//div[@class=\"info\"]");
+                            HtmlNode replyContainerUser = replyContainer.SelectSingleNode(".//a[@id=\"comment-user\"]");
+                            ScratchCommentAuthor replyContainerUserAuthor = new ScratchCommentAuthor(replyContainerInfo.SelectSingleNode(".//div[@class=\"name\"]").InnerText.Trim(), replyContainerUser.SelectSingleNode(".//img[@class=\"avatar\"]").Attributes["src"].Value);
+                            ScratchComment replyContainerUserScratchComment /* :) */ = new ScratchComment(int.Parse(replyContainer.SelectSingleNode(".//div[@class=\"comment \"]").Attributes["data-comment-id"].Value), replyContainerInfo.SelectSingleNode(".//div[@class=\"content\"]").InnerText.Trim().Replace("\n      ", ""), author, DateTime.Parse(replyContainerInfo.SelectSingleNode(".//span[@class=\"time\"]").Attributes["title"].Value));
+
+                            replies.Add(new Comment(replyContainerUserScratchComment.id, replyContainerUserScratchComment, true, new List<Comment>()));
                         }
                     }
                 }
@@ -511,7 +524,7 @@ namespace Magnifier.Controllers
                 ScratchCommentAuthor author = new ScratchCommentAuthor(info.SelectSingleNode(".//div[@class=\"name\"]").InnerText.Trim(), user.SelectSingleNode(".//img[@class=\"avatar\"]").Attributes["src"].Value);
                 ScratchComment scratchComment = new ScratchComment(int.Parse(node.Attributes["data-comment-id"].Value), info.SelectSingleNode(".//div[@class=\"content\"]").InnerText.Trim().Replace("\n      ", ""), author, DateTime.Parse(info.SelectSingleNode(".//span[@class=\"time\"]").Attributes["title"].Value));
 
-                List<int> replies = new List<int>();
+                List<Comment> replies = new List<Comment>();
 
                 if (!node.ParentNode.HasClass("reply"))
                 {
@@ -519,7 +532,12 @@ namespace Magnifier.Controllers
                     {
                         if (replyContainer.SelectSingleNode(".//div[@class=\"comment \"]") != null)
                         {
-                            replies.Add(int.Parse(replyContainer.SelectSingleNode(".//div[@class=\"comment \"]").Attributes["data-comment-id"].Value));
+                            HtmlNode replyContainerInfo = replyContainer.SelectSingleNode(".//div[@class=\"info\"]");
+                            HtmlNode replyContainerUser = replyContainer.SelectSingleNode(".//a[@id=\"comment-user\"]");
+                            ScratchCommentAuthor replyContainerUserAuthor = new ScratchCommentAuthor(replyContainerInfo.SelectSingleNode(".//div[@class=\"name\"]").InnerText.Trim(), replyContainerUser.SelectSingleNode(".//img[@class=\"avatar\"]").Attributes["src"].Value);
+                            ScratchComment replyContainerUserScratchComment /* :) */ = new ScratchComment(int.Parse(replyContainer.SelectSingleNode(".//div[@class=\"comment \"]").Attributes["data-comment-id"].Value), replyContainerInfo.SelectSingleNode(".//div[@class=\"content\"]").InnerText.Trim().Replace("\n      ", ""), author, DateTime.Parse(replyContainerInfo.SelectSingleNode(".//span[@class=\"time\"]").Attributes["title"].Value));
+
+                            replies.Add(new Comment(replyContainerUserScratchComment.id, replyContainerUserScratchComment, true, new List<Comment>()));
                         }
                     }
                 }
@@ -719,12 +737,11 @@ namespace Magnifier.Controllers
 
                 var scratchCommentReplies = JsonConvert.DeserializeObject<List<ScratchComment>>(data);
 
-                List<int> replies = new List<int>();
+                List<Comment> replies = new List<Comment>();
 
                 foreach (ScratchComment scratchComment in scratchCommentReplies)
                 {
-                    commentService.Create(new Comment(scratchComment.id, scratchComment, true, new List<int>()));
-                    replies.Add(scratchComment.id);
+                    replies.Add(commentService.Create(new Comment(scratchComment.id, scratchComment, true, new List<Comment>())));
                 }
 
                 comment = commentService.Create(new Comment(commentId, JsonConvert.DeserializeObject<ScratchComment>(await response.Content.ReadAsStringAsync()), false, replies));

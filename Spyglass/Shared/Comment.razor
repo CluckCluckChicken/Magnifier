@@ -43,9 +43,9 @@
     </div>
 
 
-    @foreach (Magnifier.Models.Comment reply in replies)
+    @foreach (Magnifier.Models.Comment reply in replys)
     {
-        <Comment location="@location" projectId="@projectId" commentId="@reply.commentId.ToString()" comment="@reply" icon="@reply.comment.author.image" username="@reply.comment.author.username" content="@reply.comment.content" dateCreated="@reply.comment.datetime_created" isTopLevel="false" replyIds="@emptyReplyList" />
+        <Comment location="@location" projectId="@projectId" commentId="@reply.commentId.ToString()" comment="@reply" icon="@reply.comment.author.image" username="@reply.comment.author.username" content="@reply.comment.content" dateCreated="@reply.comment.datetime_created" isTopLevel="false" replys="@emptyReplyList" />
     }
 }
 else
@@ -114,29 +114,14 @@ else
     public bool isTopLevel { get; set; } = true;
 
     [Parameter]
-    public List<int> replyIds { get; set; }
-
-    public List<Magnifier.Models.Comment> replies;
+    public List<Magnifier.Models.Comment> replys { get; set; } // the compiler was bullying me for some reason so i had to change this to "replys" instead of "replies"
 
     private string timeAgo;
 
-    private readonly List<int> emptyReplyList = new List<int>();
+    private readonly List<Magnifier.Models.Comment> emptyReplyList = new List<Magnifier.Models.Comment>();
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        replies = new List<Magnifier.Models.Comment>();
-
-        foreach (int replyId in replyIds)
-        {
-            Magnifier.Models.Comment reply;
-
-            reply = await Http.GetFromJsonAsync<Magnifier.Models.Comment>($"https://api.magnifier.potatophant.net/api/Comments/{replyId}");
-
-            reply.comment.content = WebUtility.HtmlDecode(reply.comment.content);
-
-            replies.Add(reply);
-        }
-
         TimeSpan ts = DateTime.Now.Subtract(dateCreated ?? DateTime.MinValue);
 
         if (ts.TotalMinutes < 2)
@@ -169,7 +154,7 @@ else
         hasInitialised = true;
     }
 
-    public async Task ViewOnScratch()
+    public void ViewOnScratch()
     {
         if (location == "studios")
         {
