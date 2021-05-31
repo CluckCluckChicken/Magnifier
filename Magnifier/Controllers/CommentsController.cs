@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -330,7 +329,9 @@ namespace Magnifier.Controllers
                         }).Start();
                     }
 
-                    replies.Add(scratchComment);
+                    Comment c = commentService.Get(scratchComment.commentId);
+
+                    replies.Add(c);
                 }
 
                 if (dbComments.Find(dbComment => dbComment.commentId == comment.id) == null)
@@ -462,7 +463,14 @@ namespace Magnifier.Controllers
                             ScratchCommentAuthor replyContainerUserAuthor = new ScratchCommentAuthor(replyContainerInfo.SelectSingleNode(".//div[@class=\"name\"]").InnerText.Trim(), replyContainerUser.SelectSingleNode(".//img[@class=\"avatar\"]").Attributes["src"].Value);
                             ScratchComment replyContainerUserScratchComment /* :) */ = new ScratchComment(int.Parse(replyContainer.SelectSingleNode(".//div[@class=\"comment \"]").Attributes["data-comment-id"].Value), replyContainerInfo.SelectSingleNode(".//div[@class=\"content\"]").InnerText.Trim().Replace("\n      ", ""), author, DateTime.Parse(replyContainerInfo.SelectSingleNode(".//span[@class=\"time\"]").Attributes["title"].Value));
 
-                            replies.Add(new Comment(replyContainerUserScratchComment.id, replyContainerUserScratchComment, true, new List<Comment>()));
+                            Comment c = commentService.Get(replyContainerUserScratchComment.id);
+
+                            if (c == null)
+                            {
+                                c = new Comment(replyContainerUserScratchComment.id, replyContainerUserScratchComment, true, new List<Comment>());
+                            }
+
+                            replies.Add(c);
                         }
                     }
                 }
@@ -537,7 +545,14 @@ namespace Magnifier.Controllers
                             ScratchCommentAuthor replyContainerUserAuthor = new ScratchCommentAuthor(replyContainerInfo.SelectSingleNode(".//div[@class=\"name\"]").InnerText.Trim(), replyContainerUser.SelectSingleNode(".//img[@class=\"avatar\"]").Attributes["src"].Value);
                             ScratchComment replyContainerUserScratchComment /* :) */ = new ScratchComment(int.Parse(replyContainer.SelectSingleNode(".//div[@class=\"comment \"]").Attributes["data-comment-id"].Value), replyContainerInfo.SelectSingleNode(".//div[@class=\"content\"]").InnerText.Trim().Replace("\n      ", ""), author, DateTime.Parse(replyContainerInfo.SelectSingleNode(".//span[@class=\"time\"]").Attributes["title"].Value));
 
-                            replies.Add(new Comment(replyContainerUserScratchComment.id, replyContainerUserScratchComment, true, new List<Comment>()));
+                            Comment c = commentService.Get(replyContainerUserScratchComment.id);
+
+                            if (c == null)
+                            {
+                                c = new Comment(replyContainerUserScratchComment.id, replyContainerUserScratchComment, true, new List<Comment>());
+                            }
+
+                            replies.Add(c);
                         }
                     }
                 }

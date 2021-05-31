@@ -70,6 +70,15 @@ else
             foreach (Magnifier.Models.Comment comment in comments)
             {
                 comment.comment.content = WebUtility.HtmlDecode(comment.comment.content);
+
+                List<Magnifier.Models.Comment> replies = new List<Magnifier.Models.Comment>();
+
+                foreach (Magnifier.Models.Comment reply in comment.replies)
+                {
+                    replies.Add(comments.Find(comment => comment.commentId == reply.commentId));
+                }
+
+                comment.replies = replies;
             }
         }
 
