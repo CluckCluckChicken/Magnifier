@@ -1,6 +1,8 @@
 # Magnifier
 Scratch comment reactions
 
+Documentation can be found [here](https://magnifier.potatophant.net/docs)
+
 ## Instructions
 The Magnifier backend consists of a C# ASP.NET Core Web API located in `Magnifier`.  
 Spyglass, the frontend, is a C# ASP.NET Core Blazor WASM app located in `Spyglass`.
