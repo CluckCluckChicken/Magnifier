@@ -37,6 +37,7 @@
                 <div id="right-buttons" class="flex flex-row showOnCommentHover">
                     <CommentButton onClick="@ViewOnScratch">View on Scratch</CommentButton>
                     <CommentButton onClick="@CopyLink">Copy Link</CommentButton>
+                    <CommentButton onClick="@CopyId">Copy ID</CommentButton>
                 </div>
             </div>
         </div>
@@ -78,6 +79,7 @@ else
                 <div id="right-buttons" class="flex flex-row showOnCommentHover">
                     <CommentButton onClick="@ViewOnScratch">View on Scratch</CommentButton>
                     <CommentButton onClick="@CopyLink">Copy Link</CommentButton>
+                    <CommentButton onClick="@CopyId">Copy ID</CommentButton>
                 </div>
             </div>
         </div>
@@ -184,6 +186,11 @@ else
         {
             await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", $"https://scratch.mit.edu/{location}/{projectId}/#comments-{commentId}");
         }
+    }
+
+    public async Task CopyId()
+    {
+        await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", commentId);
     }
 
     public async Task Report()
