@@ -15,7 +15,7 @@
         @if (AuthenticationService.user != null)
         {
             <NavbarButton href="logout">Log out</NavbarButton>
-            <a href="https://scratch.mit.edu/users/@AuthenticationService.user.username" target="_blank" rel="noopener noreferrer" style="background-image: url(@AuthenticationService.user.scratchUser.image); background-repeat: no-repeat; background-position: center; background-size: contain; width: 96px;" />
+            <a href="https://scratch.mit.edu/users/@AuthenticationService.user.username" target="_blank" rel="noopener noreferrer" class="rounded" style="background-image: url(@AuthenticationService.user.scratchUser.image); background-repeat: no-repeat; background-position: center; background-size: contain; width: 96px;" />
         }
         else
         {
@@ -35,7 +35,7 @@ else
         @if (AuthenticationService.user != null)
         {
             <NavbarButton href="logout">Log out</NavbarButton>
-            <a href="https://scratch.mit.edu/users/@AuthenticationService.user.username" target="_blank" rel="noopener noreferrer" style="background-image: url(@AuthenticationService.user.scratchUser.image); background-repeat: no-repeat; background-position: center; background-size: contain; width: 96px;" />
+            <a href="https://scratch.mit.edu/users/@AuthenticationService.user.username" target="_blank" rel="noopener noreferrer" class="rounded" style="background-image: url(@AuthenticationService.user.scratchUser.image); background-repeat: no-repeat; background-position: center; background-size: contain; width: 96px;" />
         }
         else
         {
