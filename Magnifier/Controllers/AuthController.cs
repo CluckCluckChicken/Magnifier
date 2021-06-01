@@ -33,14 +33,14 @@ namespace Magnifier.Models
         [HttpGet("code")]
         public ActionResult GenerateCode()
         {
-            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+            string consonants = "BCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz";
             int len = 36;
 
             Random rnd = new Random();
             StringBuilder b = new StringBuilder(len);
             for (int i = 0; i < len; i++)
             {
-                b.Append(chars[rnd.Next(chars.Length)]);
+                b.Append(consonants[rnd.Next(consonants.Length)]);
             }
             string result = b.ToString();
 

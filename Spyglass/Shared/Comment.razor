@@ -42,12 +42,17 @@
         </div>
     </div>
 
-
-    @foreach (Magnifier.Models.Comment reply in replys)
+    @if (replys != null)
     {
-        if (reply.isReply) 
+        foreach (Magnifier.Models.Comment reply in replys)
         {
-            <Comment location="@location" projectId="@projectId" commentId="@reply.commentId.ToString()" comment="@reply" icon="@reply.comment.author.image" username="@reply.comment.author.username" content="@reply.comment.content" dateCreated="@reply.comment.datetime_created" isTopLevel="false" replys="@emptyReplyList" />
+            if (reply != null)
+            {
+                if (reply.isReply)
+                {
+                    <Comment location="@location" projectId="@projectId" commentId="@reply.commentId.ToString()" comment="@reply" icon="@reply.comment.author.image" username="@reply.comment.author.username" content="@reply.comment.content" dateCreated="@reply.comment.datetime_created" isTopLevel="false" replys="@emptyReplyList" />
+                }
+            }
         }
     }
 }
