@@ -161,6 +161,11 @@ else
         else if (ts.TotalDays > 365000) // 1 millenium
             timeAgo = $"oh wow magnifiers old. is hytale out yet?";
 
+        foreach (Magnifier.Models.Comment reply in replys)
+        {
+            reply.comment.content = WebUtility.HtmlDecode(reply.comment.content);
+        }
+
         hasInitialised = true;
     }
 
