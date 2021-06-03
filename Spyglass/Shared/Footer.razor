@@ -15,15 +15,6 @@ else
 }
 
 @code {
-    private int starCount;
-
     [Parameter]
     public bool noMargin { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        GitHubRepo repo = await Http.GetFromJsonAsync<GitHubRepo>($"https://api.github.com/repos/cluckcluckchicken/magnifier");
-
-        starCount = repo.stargazers_count;
-    }
 }
