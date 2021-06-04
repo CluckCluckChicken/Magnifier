@@ -7,6 +7,8 @@ namespace Magnifier.Models
 {
     public record Comment
     {
+        public Comment() { }
+
         public Comment(int commentId, ScratchComment comment, bool isReply, List<Magnifier.Models.Comment> replies)
         {
             this.commentId = commentId;

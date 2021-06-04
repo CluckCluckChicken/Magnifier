@@ -25,6 +25,9 @@ namespace Magnifier.Services
         public Comment Get(int commentId) =>
             comments.Find<Comment>(comment => comment.commentId == commentId).FirstOrDefault();
 
+        public List<Comment> GetMany(List<int> commentIds) =>
+            comments.Find<Comment>(comment => commentIds.Contains(comment.commentId)).ToList();
+
         public Comment Create(Comment comment)
         {
             if (Get(comment.commentId) == null)
