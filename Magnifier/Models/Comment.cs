@@ -9,6 +9,8 @@ namespace Magnifier.Models
 {
     public record Comment
     {
+        public Comment() { }
+
         public Comment(int _commentId, ScratchComment _comment, bool _isReply, List<Comment> _replies)
         {
             commentId = _commentId;

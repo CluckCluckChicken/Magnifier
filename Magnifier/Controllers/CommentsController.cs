@@ -475,12 +475,7 @@ namespace Magnifier.Controllers
                             ScratchCommentAuthor replyContainerUserAuthor = new ScratchCommentAuthor(replyContainerInfo.SelectSingleNode(".//div[@class=\"name\"]").InnerText.Trim(), replyContainerUser.SelectSingleNode(".//img[@class=\"avatar\"]").Attributes["src"].Value);
                             ScratchComment replyContainerUserScratchComment /* :) */ = new ScratchComment(int.Parse(replyContainer.SelectSingleNode(".//div[@class=\"comment \"]").Attributes["data-comment-id"].Value), replyContainerInfo.SelectSingleNode(".//div[@class=\"content\"]").InnerText.Trim().Replace("\n      ", ""), replyContainerUserAuthor, DateTime.Parse(replyContainerInfo.SelectSingleNode(".//span[@class=\"time\"]").Attributes["title"].Value));
 
-                            Comment r = commentService.Get(replyContainerUserScratchComment.id);
-
-                            if (r == null)
-                            {
-                                r = new Comment(replyContainerUserScratchComment.id, replyContainerUserScratchComment, true, new List<Comment>());
-                            }
+                            Comment r = new Comment(replyContainerUserScratchComment.id, replyContainerUserScratchComment, true, new List<Comment>());
 
                             replies.Add(r);
 
@@ -488,55 +483,70 @@ namespace Magnifier.Controllers
                         }
                     }
 
-                    Comment c = commentService.Get(scratchComment.id);
-
-                    if (c == null)
-                    {
-                        c = new Comment(scratchComment.id, scratchComment, false, replies);
-                    }
-                    else
-                    {
-                        c.replies = replies;
-                    }
+                    Comment c = new Comment(scratchComment.id, scratchComment, false, replies);
 
                     comments.Add(c);
-                }                
+                }
             }
 
-            List<Comment> dbComments = commentService.Get();
+            List<int> commentIds = comments.Select(comment => comment.commentId).ToList();
+
+            List<Comment> dbComments = commentService.GetMany(commentIds);
+
+            /*foreach (Comment dbComment in dbComments)
+            {
+                Comment c = dbComment;
+                c.replies = comments.Find(comment => comment.commentId == dbComment.commentId).replies;
+                if (dbComment.replies != c.replies)
+                {
+                    commentService.Update(dbComment.commentId, c);
+                }
+                comments[comments.IndexOf(comments.Find(comment => comment.commentId == dbComment.commentId))] = c;
+            }*/
+
+            List<Comment> workingComments = new List<Comment>();
 
             foreach (Comment comment in comments)
             {
-                if (dbComments.Find(dbComment => dbComment.commentId == comment.commentId) == null)
+                workingComments.Add(new Comment
                 {
-                    dbComments.Add(comment);
-                    new Thread(() =>
-                    {
-                        commentService.Create(comment);
-                    }).Start();
-                }
-                else
-                {
-                    if (!comment.isReply)
-                    {
-                        dbComments[dbComments.FindIndex(dbComment => dbComment.commentId == comment.commentId)] = comment;
-                        new Thread(() =>
-                        {
-                            commentService.Update(comment.commentId, comment);
-                        }).Start();
-                    }
-                }
+                    _id = comment._id,
+                    commentId = comment.commentId,
+                    comment = comment.comment,
+                    reactions = comment.reactions,
+                    isPinned = comment.isPinned,
+                    isReply = comment.isReply,
+                    replies = comment.replies
+                });
             }
 
-            List<Comment> matchingComments = dbComments.FindAll(comment => comments.Find(comment2 => comment2.commentId == comment.commentId) != null);
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            Task.Run(() =>
+            {
+                foreach (Comment comment in workingComments)
+                {
+                    if (dbComments.Find(dbComment => dbComment.commentId == comment.commentId) == null)
+                    {
+                        commentService.Create(comment);
+                    }
+                    else
+                    {
+                        Comment c = dbComments.Find(dbComment => dbComment.commentId == comment.commentId);
+                        c.replies = comment.replies;
+                        commentService.Update(comment.commentId, c);
+                    }
+                }
+            });
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
-            matchingComments = matchingComments
-                .Where(p => p.comment.datetime_created.HasValue)
-                .OrderBy(p => p.comment.datetime_created.Value)
-                .Reverse()
-                .ToList();
+            foreach (Comment dbComment in dbComments)
+            {
+                Comment c = dbComment;
+                c.replies = comments.Find(comment => comment.commentId == dbComment.commentId).replies;
+                comments[comments.IndexOf(comments.Find(comment => comment.commentId == dbComment.commentId))] = c;
+            }
 
-            return Ok(System.Text.Json.JsonSerializer.Serialize(matchingComments));
+            return Ok(JsonConvert.SerializeObject(comments));
         }
 
         [HttpGet("studios/{studioId}/{page}")]
