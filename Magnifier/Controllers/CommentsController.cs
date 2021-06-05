@@ -447,14 +447,7 @@ namespace Magnifier.Controllers
 
             try
             {
-                if (page == 1)
-                {
-                    response = await client.GetStringAsync($"https://scratch.mit.edu/site-api/comments/user/{username}");
-                }
-                else
-                {
-                    response = await client.GetStringAsync($"https://scratch.mit.edu/site-api/comments/user/{username}?page={page}");
-                }
+                response = await client.GetStringAsync($"https://scratch.mit.edu/site-api/comments/user/{username}?page={page}");
             }
             catch
             {
@@ -564,14 +557,7 @@ namespace Magnifier.Controllers
 
             try
             {
-                if (page == 1)
-                {
-                    response = await client.GetStringAsync($"https://scratch.mit.edu/site-api/comments/gallery/{studioId}");
-                }
-                else
-                {
-                    response = await client.GetStringAsync($"https://scratch.mit.edu/site-api/comments/gallery/{studioId}?page={page}");
-                }
+                response = await client.GetStringAsync($"https://scratch.mit.edu/site-api/comments/gallery/{studioId}?page={page}");
             }
             catch
             {

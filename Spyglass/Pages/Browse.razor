@@ -17,7 +17,7 @@
         <Heading size="3">@projectProgress</Heading>
     </EditForm>
     <EditForm Model="@profileQuery" OnValidSubmit="@ViewProfileComments">
-        <Heading size="3">Users (case sensitive)</Heading>
+        <Heading size="3">Users</Heading>
         <InputText @bind-Value="@profileQuery.id" placeholder="Scratch username" class="transition duration-300 bg-white hover:bg-whiteHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3"></InputText>
         <Button>View comments</Button>
         @if (!profileExists)
