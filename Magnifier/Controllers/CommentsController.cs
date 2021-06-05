@@ -313,18 +313,7 @@ namespace Magnifier.Controllers
                     return NotFound(requestResponse.statusCode.ToString());
                 }
 
-                List<Comment> scratchCommentReplies = requestResponse.comments;
-
-                List<Comment> replies = new List<Comment>();
-
-                foreach (Comment reply in replies)
-                {
-                    Comment r = new Comment(reply.commentId, reply.comment, true, new List<Comment>());
-
-                    replies.Add(r);
-
-                    comments.Add(r);
-                }
+                List<Comment> replies = requestResponse.comments;
 
                 Comment c = new Comment(comment.id, comment, false, replies);
 
