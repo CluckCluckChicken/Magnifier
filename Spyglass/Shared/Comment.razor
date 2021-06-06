@@ -6,11 +6,11 @@
 @inject NavigationManager NavigationManager
 
 <style>
-    #comment-@commentId .showOnCommentHover {
+    #comments-@commentId .showOnCommentHover {
         visibility: hidden;
     }
 
-    #comment-@commentId:hover .showOnCommentHover {
+    #comments-@commentId:hover .showOnCommentHover {
         visibility: visible;
     }
 </style>
@@ -59,7 +59,7 @@
 }
 else
 {
-    <div id="comment-@commentId" class="flex flex-row ml-16" style="width: calc(50% - 4rem);">
+    <div id="comments-@commentId" class="flex flex-row ml-16" style="width: calc(50% - 4rem);">
         <a href="https://scratch.mit.edu/users/@username" target="_blank" rel="noopener noreferrer" class="mr-2">
             <img src="@icon" class="float-left rounded" style="width: 60px; height: 60px;" />
         </a>

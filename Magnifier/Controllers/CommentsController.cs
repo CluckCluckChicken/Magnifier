@@ -117,12 +117,14 @@ namespace Magnifier.Controllers
         [HttpGet("{commentId}")]
         public ActionResult GetComment(int commentId)
         {
-            if (commentService.Get(commentId) == null)
+            Comment comment = commentService.Get(commentId);
+
+            if (comment == null)
             {
                 return NotFound();
             }
 
-            return Ok(commentService.Get(commentId));
+            return Ok(comment);
         }
 
         /*[HttpGet("{projectId}/{commentId}")]
