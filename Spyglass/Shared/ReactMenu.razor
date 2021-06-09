@@ -40,18 +40,9 @@
 
     private bool notFound = false;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await ReactionService.Initialize();
-
         reactions = ReactionService.reactions;
-        /*
-        HttpResponseMessage comment = await Http.GetAsync($"https://api.magnifier.potatophant.net/api/Comments/{commentId}");
-
-        if (comment.StatusCode == System.Net.HttpStatusCode.NotFound)
-        {
-            notFound = true;
-        }*/
 
         hasInitialised = true;
     }

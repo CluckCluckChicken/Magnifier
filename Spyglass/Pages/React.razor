@@ -1,12 +1,14 @@
 ﻿@page "/react"
 @page "/react/{commentId}/{name}"
 @using Magnifier.Models
+@using Services
 @inject HttpClient Http
 
 @if (hasInitialized)
 {
     <Heading size="3">Do you want to toggle reaction @reaction.emoji to the following comment?</Heading>
-    <Button>Yes</Button><Button>No</Button>
+    <Button>Yes</Button>
+    <Button>No</Button>
 }
 
 @code {
