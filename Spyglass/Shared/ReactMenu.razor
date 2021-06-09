@@ -1,6 +1,7 @@
 ﻿@using Magnifier.Models
 @using Services
 @inject HttpClient Http
+@inject NavigationManager NavigationManager
 @inject ReactionService ReactionService
 
 <div class="flex flex-row">
@@ -14,7 +15,7 @@
         {
             foreach (Reaction reaction in reactions)
             {
-                <ReactionButton projectId="@projectId" commentId="@commentId" comment="@comment" reaction="@reaction" />
+                <ReactionButton commentId="@commentId" reactions="@commentReactions" reaction="@reaction" />
             }
         }
     }
@@ -32,12 +33,17 @@
     [Parameter]
     public Magnifier.Models.Comment comment { get; set; }
 
+    [Parameter]
+    public List<Magnifier.Models.UserReaction> commentReactions { get; set; }
+
     private List<Reaction> reactions { get; set; }
 
     private bool notFound = false;
 
     protected override async Task OnInitializedAsync()
     {
+        await ReactionService.Initialize();
+
         reactions = ReactionService.reactions;
         /*
         HttpResponseMessage comment = await Http.GetAsync($"https://api.magnifier.potatophant.net/api/Comments/{commentId}");

@@ -29,6 +29,12 @@ namespace Magnifier.Controllers
             return Ok(reactionService.Get());
         }
 
+        [HttpGet("{name}")]
+        public ActionResult GetReaction(string name)
+        {
+            return Ok(reactionService.Get(name));
+        }
+
         [HttpPost("{name}")]
         [Authorize]
         public ActionResult CreateReaction(string name, string emoji)

@@ -1,19 +1,29 @@
 ﻿@page "/react"
-@page "/react/{commentId}"
+@page "/react/{commentId}/{name}"
+@using Magnifier.Models
+@inject HttpClient Http
 
-@if (string.IsNullOrEmpty(commentId) || string.IsNullOrEmpty(projectId))
+@if (hasInitialized)
 {
-    <p>you need to include a project id and a comment id.</p>
-}
-else
-{
-    <ReactMenu projectId="@projectId" commentId="@commentId" />
+    <Heading size="3">Do you want to toggle reaction @reaction.emoji to the following comment?</Heading>
+    <Button>Yes</Button><Button>No</Button>
 }
 
 @code {
+    private bool hasInitialized = false;
+
     [Parameter]
     public string commentId { get; set; }
 
     [Parameter]
-    public string projectId { get; set; }
+    public string name { get; set; }
+
+    public Reaction reaction { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        reaction = await Http.GetFromJsonAsync<Reaction>($"https://api.magnifier.potatophant.net/api/Reactions/{name}");
+
+        hasInitialized = true;
+    }
 }

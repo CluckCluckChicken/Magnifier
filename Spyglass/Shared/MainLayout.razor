@@ -1,9 +1,21 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 
-<header id="header">
-    <Navbar fixedPosition="@fixNavbar" />
-</header>
+@if (new Uri(NavigationManager.Uri).Segments.Length >= 2)
+{
+    if (new Uri(NavigationManager.Uri).Segments[1] != "react/" && new Uri(NavigationManager.Uri).Segments[1] != "react")
+    {
+        <header id="header">
+            <Navbar fixedPosition="@fixNavbar" />
+        </header>
+    }
+}
+else
+{
+    <header id="header">
+        <Navbar fixedPosition="@fixNavbar" />
+    </header>
+}
 
 <div class="main">
     <div id="body" class="content" style="padding: 0 !important;">
@@ -16,7 +28,7 @@
 
 @if (new Uri(NavigationManager.Uri).Segments.Length >= 2)
 {
-    if (new Uri(NavigationManager.Uri).Segments[1] != "projects/" && new Uri(NavigationManager.Uri).Segments[1] != "users/" && new Uri(NavigationManager.Uri).Segments[1] != "studios/")
+    if (new Uri(NavigationManager.Uri).Segments[1] != "projects/" && new Uri(NavigationManager.Uri).Segments[1] != "users/" && new Uri(NavigationManager.Uri).Segments[1] != "studios/" && new Uri(NavigationManager.Uri).Segments[1] != "react/" && new Uri(NavigationManager.Uri).Segments[1] != "react")
     {
         <footer>
             <Footer />

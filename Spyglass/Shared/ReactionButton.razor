@@ -21,13 +21,10 @@
     private bool hasInitialised = false;
 
     [Parameter]
-    public string projectId { get; set; }
-
-    [Parameter]
     public string commentId { get; set; }
 
     [Parameter]
-    public Magnifier.Models.Comment comment { get; set; }
+    public List<Magnifier.Models.UserReaction> reactions { get; set; }
 
     [Parameter]
     public Reaction reaction { get; set; }
@@ -49,14 +46,14 @@
     {
         if (fetch)
         {
-            comment = await Http.GetFromJsonAsync<Magnifier.Models.Comment>($"https://api.magnifier.potatophant.net/api/Comments/{commentId}");
+            reactions = await Http.GetFromJsonAsync<List<Magnifier.Models.UserReaction>>($"https://api.magnifier.potatophant.net/api/Comments/{commentId}/reactions");
         }
 
         count = 0;
 
-        if (comment.reactions != null && comment.reactions.Count != 0)
+        if (reactions != null && reactions.Count != 0)
         {
-            foreach (UserReaction reaction in comment.reactions)
+            foreach (UserReaction reaction in reactions)
             {
                 if (reaction.reaction == this.reaction.name)
                 {

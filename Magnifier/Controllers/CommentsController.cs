@@ -127,6 +127,19 @@ namespace Magnifier.Controllers
             return Ok(comment);
         }
 
+        [HttpGet("{commentId}/reactions")]
+        public ActionResult GetCommentReactions(int commentId)
+        {
+            Comment comment = commentService.Get(commentId);
+
+            if (comment == null)
+            {
+                return Ok(new List<UserReaction>());
+            }
+
+            return Ok(comment.reactions);
+        }
+
         /*[HttpGet("{projectId}/{commentId}")]
         public async Task<ActionResult> GetCommentAsync(int projectId, int commentId)
         {
