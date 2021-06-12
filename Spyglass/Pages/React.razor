@@ -34,7 +34,7 @@
 
     private async Task Yes()
     {
-        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"https://api.magnifier.potatophant.net/api/Comments/{commentId}/reactions?reaction={reaction}");
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"https://api.magnifier.potatophant.net/api/Comments/{commentId}/reactions?reaction={name}");
         request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", LocalStorage.GetItem<string>("token"));
         await Http.SendAsync(request);
 
