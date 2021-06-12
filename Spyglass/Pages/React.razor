@@ -2,12 +2,15 @@
 @page "/react/{commentId}/{name}"
 @using Magnifier.Models
 @using Services
+@inject AuthenticationService AuthenticationService
+@inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
 @inject HttpClient Http
+@inject IJSRuntime JsRuntime;
 
 @if (hasInitialized)
 {
     <Heading size="3">Do you want to toggle reaction @reaction.emoji to the following comment?</Heading>
-    <Button>Yes</Button>
+    <Button onClick="@Yes">Yes</Button>
     <Button>No</Button>
 }
 
@@ -27,5 +30,14 @@
         reaction = await Http.GetFromJsonAsync<Reaction>($"https://api.magnifier.potatophant.net/api/Reactions/{name}");
 
         hasInitialized = true;
+    }
+
+    private async Task Yes()
+    {
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"https://api.magnifier.potatophant.net/api/Comments/{commentId}/reactions?reaction={reaction}");
+        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", LocalStorage.GetItem<string>("token"));
+        await Http.SendAsync(request);
+
+        await JsRuntime.InvokeVoidAsync("close");
     }
 }
