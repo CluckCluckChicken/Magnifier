@@ -15,7 +15,7 @@
         {
             foreach (Reaction reaction in reactions)
             {
-                <ReactionButton commentId="@commentId" reactions="@commentReactions" reaction="@reaction" />
+                <ReactionButton commentId="@commentId" reactions="@comment.reactions" reaction="@reaction" />
             }
         }
     }
@@ -32,9 +32,6 @@
 
     [Parameter]
     public Magnifier.Models.Comment comment { get; set; }
-
-    [Parameter]
-    public List<Magnifier.Models.UserReaction> commentReactions { get; set; }
 
     private List<Reaction> reactions { get; set; }
 
