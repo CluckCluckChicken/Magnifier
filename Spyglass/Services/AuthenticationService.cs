@@ -31,7 +31,7 @@ namespace Spyglass.Services
 
         public async Task<AuthenticationResponse> Login(string authCode)
         {
-            HttpResponseMessage response = await Http.GetAsync($"https://api.magnifier.potatophant.net/api/Auth/token?code={authCode}");
+            HttpResponseMessage response = await Http.GetAsync($"https://magnifier-api.potatophant.net/api/Auth/token?code={authCode}");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -42,7 +42,7 @@ namespace Spyglass.Services
 
             LocalStorage.SetItem("token", token);
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"https://api.magnifier.potatophant.net/api/Auth/user");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"https://magnifier-api.potatophant.net/api/Auth/user");
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", LocalStorage.GetItem<string>("token"));
             HttpResponseMessage userResponse = await Http.SendAsync(request);
             string json = await userResponse.Content.ReadAsStringAsync();

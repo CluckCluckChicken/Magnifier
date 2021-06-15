@@ -46,7 +46,7 @@
     {
         if (fetch)
         {
-            reactions = await Http.GetFromJsonAsync<List<Magnifier.Models.UserReaction>>($"https://api.magnifier.potatophant.net/api/Comments/{commentId}/reactions");
+            reactions = await Http.GetFromJsonAsync<List<Magnifier.Models.UserReaction>>($"https://magnifier-api.potatophant.net/api/Comments/{commentId}/reactions");
         }
 
         count = 0;
@@ -86,7 +86,7 @@
             count += hasReacted ? -1 : 1;
             hasReacted = !hasReacted;
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"https://api.magnifier.potatophant.net/api/Comments/{commentId}/reactions?reaction={reaction}");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"https://magnifier-api.potatophant.net/api/Comments/{commentId}/reactions?reaction={reaction}");
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", LocalStorage.GetItem<string>("token"));
             await Http.SendAsync(request);
 

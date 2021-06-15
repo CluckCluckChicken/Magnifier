@@ -27,14 +27,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        reaction = await Http.GetFromJsonAsync<Reaction>($"https://api.magnifier.potatophant.net/api/Reactions/{name}");
+        reaction = await Http.GetFromJsonAsync<Reaction>($"https://magnifier-api.potatophant.net/api/Reactions/{name}");
 
         hasInitialized = true;
     }
 
     private async Task Yes()
     {
-        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"https://api.magnifier.potatophant.net/api/Comments/{commentId}/reactions?reaction={name}");
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"https://magnifier-api.potatophant.net/api/Comments/{commentId}/reactions?reaction={name}");
         request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", LocalStorage.GetItem<string>("token"));
         await Http.SendAsync(request);
 

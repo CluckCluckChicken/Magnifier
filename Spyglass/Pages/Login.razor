@@ -35,7 +35,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        authCode = await Http.GetStringAsync($"https://api.magnifier.potatophant.net/api/Auth/code");
+        authCode = await Http.GetStringAsync($"https://magnifier-api.potatophant.net/api/Auth/code");
     }
 
     private async Task ShowAuthProject()
@@ -50,7 +50,7 @@
         if (response.response.IsSuccessStatusCode)
         {
 
-            if (AuthenticationService.user.username == "46009361" || AuthenticationService.user.username == "Scunthorpe" || AuthenticationService.user.username == "mouse-pointer")
+            if (AuthenticationService.user.username == "46009361")
             {
                 AuthenticationService.Logout();
                 await JSRuntime.InvokeVoidAsync("alert", "go away");
