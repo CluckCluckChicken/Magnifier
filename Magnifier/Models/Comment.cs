@@ -37,5 +37,7 @@ namespace Magnifier.Models
         public bool isReply { get; set; }
 
         public List<Comment> replies { get; set; }
+
+        // TODO: add properties for where the comment resides, etc
     }
 }
