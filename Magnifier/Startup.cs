@@ -68,6 +68,7 @@ namespace Magnifier
             services.AddSingleton<JwtAuthService>();
             services.AddSingleton<AuthCodeService>();
             services.AddSingleton<UserService>();
+            services.AddSingleton<CommentSearchService>();
 
             services.AddCors(policy =>
             {
