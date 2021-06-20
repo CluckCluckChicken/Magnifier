@@ -58,34 +58,6 @@ namespace Magnifier.Controllers
             return new ScratchRequestResponse(requestResponse.response, _comment: JsonConvert.DeserializeObject<ScratchComment>(data));
         }
 
-        /*private async Task<ScratchRequestResponse> GetScratchCommentReplies(int projectId, int commentId)
-        {
-            ScratchRequestResponse requestResponse = await GetScratchProject(projectId);
-
-            if (!requestResponse.succeeded)
-            {
-                return new ScratchRequestResponse(requestResponse.response);
-            }
-
-            ScratchProject project = requestResponse.project;
-
-            string projectOwner = project.author.username;
-
-            requestResponse = await GetScratchComment(projectId, commentId);
-
-            if (!requestResponse.succeeded)
-            {
-                return new ScratchRequestResponse(requestResponse.response);
-            }
-
-            ScratchComment comment = requestResponse.comment;
-
-            HttpResponseMessage response = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{comment.id}/replies");
-            var data = await response.Content.ReadAsStringAsync();
-
-            return new ScratchRequestResponse(requestResponse.response, _comments: JsonConvert.DeserializeObject<List<ScratchComment>>(data));
-        }*/
-
         private async Task<ScratchRequestResponse> GetScratchCommentReplies(string projectOwner, int projectId, int commentId)
         {
             HttpResponseMessage response = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{commentId}/replies");
@@ -105,7 +77,7 @@ namespace Magnifier.Controllers
 
                 if (c == null)
                 {
-                    c = commentService.Create(new Comment(comment.id, comment, true, new List<Comment>()));
+                    c = commentService.Create(new Comment(comment.id, comment, Residence.Project, projectId.ToString(), true, new List<Comment>()));
                 }
 
                 replies.Add(c);
@@ -139,43 +111,6 @@ namespace Magnifier.Controllers
 
             return Ok(comment.reactions);
         }
-
-        /*[HttpGet("{projectId}/{commentId}")]
-        public async Task<ActionResult> GetCommentAsync(int projectId, int commentId)
-        {
-            if (commentService.Get(commentId) == null)
-            {
-                ScratchRequestResponse requestResponse = await GetScratchComment(projectId, commentId);
-
-                if (!requestResponse.succeeded)
-                {
-                    return NotFound(requestResponse.statusCode.ToString());
-                }
-
-                ScratchComment comment = requestResponse.comment;
-
-                requestResponse = await GetScratchCommentReplies(projectId, comment.id);
-
-                if (!requestResponse.succeeded)
-                {
-                    return NotFound(requestResponse.statusCode.ToString());
-                }
-
-                var scratchCommentReplies = requestResponse.comments;
-
-                List<int> replies = new List<int>();
-
-                foreach (ScratchComment scratchComment in scratchCommentReplies)
-                {
-                    commentService.Create(new Comment(scratchComment.id, scratchComment, true, new List<int>()));
-                    replies.Add(scratchComment.id);
-                }
-
-                commentService.Create(new Comment(comment.id, comment, false, replies));
-            }
-
-            return Ok(commentService.Get(commentId));
-        }*/
 
         [HttpGet("projects/{projectId}/exists")]
         public async Task<ActionResult> GetIfProjectExistsAsync(int projectId)
@@ -216,83 +151,6 @@ namespace Magnifier.Controllers
             return Ok();
         }
 
-        /*[HttpGet("projects/{projectId}/{page}")]
-        public async Task<ActionResult> GetProjectCommentsAsync(int projectId, int page)
-        {
-            ScratchRequestResponse requestResponse = await GetScratchProject(projectId);
-
-            if (!requestResponse.succeeded)
-            {
-                return NotFound(requestResponse.statusCode.ToString());
-            }
-
-            ScratchProject project = requestResponse.project;
-
-            if (project.author == null)
-            {
-                return BadRequest("that project doesnt exist");
-            }
-
-            string projectOwner = project.author.username;
-
-            var response = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments?offset={(page - 1) * 20}");
-            var data = await response.Content.ReadAsStringAsync();
-
-            List<ScratchComment> comments = JsonConvert.DeserializeObject<List<ScratchComment>>(data);
-
-            List<Comment> dbComments = commentService.Get();
-
-            foreach (ScratchComment comment in comments)
-            {
-                requestResponse = await GetScratchCommentReplies(projectOwner, projectId, comment.id);
-
-                if (!requestResponse.succeeded)
-                {
-                    return NotFound(requestResponse.statusCode.ToString());
-                }
-
-                var scratchCommentReplies = requestResponse.comments;
-
-                List<int> replies = new List<int>();
-
-                foreach (int scratchComment in scratchCommentReplies)
-                {
-                    if (commentService.Get(scratchComment) == null)
-                    {
-                        ScratchRequestResponse imrunningoutofvariablenames = await GetScratchComment(projectId, scratchComment);
-
-                        commentService.Create(new Comment(scratchComment, imrunningoutofvariablenames.comment, true, new List<int>()));
-                    }
-                    replies.Add(scratchComment);
-                }
-
-                if (dbComments.Find(dbComment => dbComment.commentId == comment.id) == null)
-                {
-                    commentService.Create(new Comment(comment.id, comment, false, replies));
-                }
-                else
-                {
-                    Comment sendhelp = commentService.Get(comment.id);
-
-                    sendhelp.replies = replies;
-
-                    commentService.Update(comment.id, sendhelp);
-                }
-            }
-
-            dbComments = commentService.Get();
-
-            List<Comment> matchingComments = commentService.Get().FindAll(comment => comments.Find(scratchComment => scratchComment.id == comment.commentId) != null);
-
-            matchingComments = matchingComments
-                .Where(p => p.comment.datetime_created.HasValue)
-                .OrderBy(p => p.comment.datetime_created.Value)
-                .Reverse()
-                .ToList();
-
-            return Ok(System.Text.Json.JsonSerializer.Serialize(matchingComments));
-        }*/
-
         [HttpGet("projects/{projectId}/{page}")]
         public async Task<ActionResult> GetProjectCommentsAsync(int projectId, int page)
         {
@@ -330,7 +188,7 @@ namespace Magnifier.Controllers
 
                 List<Comment> replies = requestResponse.comments;
 
-                Comment c = new Comment(comment.id, comment, false, replies);
+                Comment c = new Comment(comment.id, comment, Residence.Project, projectId.ToString(), false, replies);
 
                 comments.Add(c);
             }
@@ -348,6 +206,8 @@ namespace Magnifier.Controllers
                     _id = comment._id,
                     commentId = comment.commentId,
                     comment = comment.comment,
+                    residence = comment.residence,
+                    residenceId = comment.residenceId,
                     reactions = comment.reactions,
                     isPinned = comment.isPinned,
                     isReply = comment.isReply,
@@ -367,6 +227,8 @@ namespace Magnifier.Controllers
                     else
                     {
                         Comment c = dbComments.Find(dbComment => dbComment.commentId == comment.commentId);
+                        c.residence = comment.residence;
+                        c.residenceId = comment.residenceId;
                         c.replies = comment.replies;
                         commentService.Update(comment.commentId, c);
                     }
@@ -383,66 +245,6 @@ namespace Magnifier.Controllers
 
             return Ok(JsonConvert.SerializeObject(comments));
         }
-
-        /*[HttpGet("projects/{projectId}/{page}")]
-        public async Task<ActionResult> GetProjectCommentsAsync(int projectId, int page)
-        {
-            ScratchRequestResponse requestResponse = await GetScratchProject(projectId);
-
-            if (!requestResponse.succeeded)
-            {
-                return NotFound(requestResponse.statusCode.ToString());
-            }
-
-            ScratchProject project = requestResponse.project;
-
-            if (project.author == null)
-            {
-                return BadRequest("that project doesnt exist");
-            }
-
-            string projectOwner = project.author.username;
-
-            var response = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments?offset={(page - 1) * 20}");
-            var data = await response.Content.ReadAsStringAsync();
-
-            List<ScratchComment> scratchComments = JsonConvert.DeserializeObject<List<ScratchComment>>(data);
-
-            List<Comment> dbComments = commentService.Get();
-
-            List<Comment> comments = new List<Comment>();
-
-            foreach (ScratchComment scratchComment in scratchComments)
-            {
-                requestResponse = await GetScratchCommentReplies(projectOwner, projectId, scratchComment.id);
-
-                if (!requestResponse.succeeded)
-                {
-                    return NotFound(requestResponse.statusCode.ToString());
-                }
-
-                var scratchCommentReplies = requestResponse.comments;
-
-                List<int> replies = new List<int>();
-
-                foreach (int scratchCommentReply in scratchCommentReplies)
-                {
-                    ScratchRequestResponse imrunningoutofvariablenames = await GetScratchComment(projectId, scratchCommentReply);
-                    replies.Add(scratchCommentReply);
-                }
-
-                if (dbComments.Find(comment => comment.commentId == scratchComment.id) == null)
-                {
-                    comments.Add(new Comment(scratchComment.id, scratchComment, false, replies));
-                }
-                else
-                {
-                    comments.Add(dbComments.Find(comment => comment.commentId == scratchComment.id));
-                }
-            }
-
-            return Ok(System.Text.Json.JsonSerializer.Serialize(comments));
-        }*/
 
         [HttpGet("users/{username}/{page}")]
         public async Task<ActionResult> GetUserCommentsAsync(string username, int page)
@@ -491,7 +293,7 @@ namespace Magnifier.Controllers
                             ScratchCommentAuthor replyContainerUserAuthor = new ScratchCommentAuthor(replyContainerInfo.SelectSingleNode(".//div[@class=\"name\"]").InnerText.Trim(), replyContainerUser.SelectSingleNode(".//img[@class=\"avatar\"]").Attributes["src"].Value);
                             ScratchComment replyContainerUserScratchComment /* :) */ = new ScratchComment(int.Parse(replyContainer.SelectSingleNode(".//div[@class=\"comment \"]").Attributes["data-comment-id"].Value), replyContainerInfo.SelectSingleNode(".//div[@class=\"content\"]").InnerText.Trim().Replace("\n      ", ""), replyContainerUserAuthor, DateTime.Parse(replyContainerInfo.SelectSingleNode(".//span[@class=\"time\"]").Attributes["title"].Value));
 
-                            Comment r = new Comment(replyContainerUserScratchComment.id, replyContainerUserScratchComment, true, new List<Comment>());
+                            Comment r = new Comment(replyContainerUserScratchComment.id, replyContainerUserScratchComment, Residence.User, username, true, new List<Comment>());
 
                             replies.Add(r);
 
@@ -499,7 +301,7 @@ namespace Magnifier.Controllers
                         }
                     }
 
-                    Comment c = new Comment(scratchComment.id, scratchComment, false, replies);
+                    Comment c = new Comment(scratchComment.id, scratchComment, Residence.User, username, false, replies);
 
                     comments.Add(c);
                 }
@@ -518,6 +320,8 @@ namespace Magnifier.Controllers
                     _id = comment._id,
                     commentId = comment.commentId,
                     comment = comment.comment,
+                    residence = comment.residence,
+                    residenceId = comment.residenceId,
                     reactions = comment.reactions,
                     isPinned = comment.isPinned,
                     isReply = comment.isReply,
@@ -537,6 +341,8 @@ namespace Magnifier.Controllers
                     else
                     {
                         Comment c = dbComments.Find(dbComment => dbComment.commentId == comment.commentId);
+                        c.residence = comment.residence;
+                        c.residenceId = comment.residenceId;
                         c.replies = comment.replies;
                         commentService.Update(comment.commentId, c);
                     }
@@ -601,7 +407,7 @@ namespace Magnifier.Controllers
                             ScratchCommentAuthor replyContainerUserAuthor = new ScratchCommentAuthor(replyContainerInfo.SelectSingleNode(".//div[@class=\"name\"]").InnerText.Trim(), replyContainerUser.SelectSingleNode(".//img[@class=\"avatar\"]").Attributes["src"].Value);
                             ScratchComment replyContainerUserScratchComment /* :) */ = new ScratchComment(int.Parse(replyContainer.SelectSingleNode(".//div[@class=\"comment \"]").Attributes["data-comment-id"].Value), replyContainerInfo.SelectSingleNode(".//div[@class=\"content\"]").InnerText.Trim().Replace("\n      ", ""), replyContainerUserAuthor, DateTime.Parse(replyContainerInfo.SelectSingleNode(".//span[@class=\"time\"]").Attributes["title"].Value));
 
-                            Comment r = new Comment(replyContainerUserScratchComment.id, replyContainerUserScratchComment, true, new List<Comment>());
+                            Comment r = new Comment(replyContainerUserScratchComment.id, replyContainerUserScratchComment, Residence.Studio, studioId.ToString(), true, new List<Comment>());
 
                             replies.Add(r);
 
@@ -609,7 +415,7 @@ namespace Magnifier.Controllers
                         }
                     }
 
-                    Comment c = new Comment(scratchComment.id, scratchComment, false, replies);
+                    Comment c = new Comment(scratchComment.id, scratchComment, Residence.Studio, studioId.ToString(), false, replies);
 
                     comments.Add(c);
                 }
@@ -628,6 +434,8 @@ namespace Magnifier.Controllers
                     _id = comment._id,
                     commentId = comment.commentId,
                     comment = comment.comment,
+                    residence = comment.residence,
+                    residenceId = comment.residenceId,
                     reactions = comment.reactions,
                     isPinned = comment.isPinned,
                     isReply = comment.isReply,
@@ -647,6 +455,8 @@ namespace Magnifier.Controllers
                     else
                     {
                         Comment c = dbComments.Find(dbComment => dbComment.commentId == comment.commentId);
+                        c.residence = comment.residence;
+                        c.residenceId = comment.residenceId;
                         c.replies = comment.replies;
                         commentService.Update(comment.commentId, c);
                     }
@@ -663,91 +473,6 @@ namespace Magnifier.Controllers
 
             return Ok(JsonConvert.SerializeObject(comments));
         }
-
-        /*[HttpPut("{projectId}/{commentId}/reactions")]
-        [Authorize]
-        public async Task<ActionResult> PutReactionAsync(int projectId, int commentId, string reaction)
-        {
-            ScratchRequestResponse requestResponse = await GetScratchProject(projectId);
-
-            if (!requestResponse.succeeded)
-            {
-                return NotFound(requestResponse.statusCode.ToString());
-            }
-
-            ScratchProject project = requestResponse.project;
-
-            if (project.author == null)
-            {
-                return BadRequest("that project doesnt exist");
-            }
-
-            string projectOwner = project.author.username;
-
-            Comment comment;
-
-            string projectUrl = $"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}";
-
-            var response = await client.GetAsync(projectUrl);
-
-            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                return NotFound();
-            }
-
-            if (commentService.Get(commentId) == null)
-            {
-                string commentUrl = $"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{commentId}";
-
-                response = await client.GetAsync(commentUrl);
-
-                var repliesResponse = await client.GetAsync($"https://api.scratch.mit.edu/users/{projectOwner}/projects/{projectId}/comments/{commentId}/replies");
-                var data = await repliesResponse.Content.ReadAsStringAsync();
-
-                var scratchCommentReplies = JsonConvert.DeserializeObject<List<ScratchComment>>(data);
-
-                List<int> replies = new List<int>();
-
-                foreach (ScratchComment scratchComment in scratchCommentReplies)
-                {
-                    commentService.Create(new Comment(scratchComment.id, scratchComment, true, new List<int>()));
-                    replies.Add(scratchComment.id);
-                }
-
-                comment = commentService.Create(new Comment(commentId, JsonConvert.DeserializeObject<ScratchComment>(await response.Content.ReadAsStringAsync()), false, replies));
-            }
-            else
-            {
-                comment = commentService.Get(commentId);
-            }
-
-            if (comment.reactions == null)
-            {
-                comment.reactions = new List<UserReaction>();
-            }
-
-            if (reactionService.Get(reaction) != null)
-            {
-                string username = HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value;
-
-                UserReaction userReaction = new UserReaction(username, reaction);
-
-                if (comment.reactions.Find(userReaction => userReaction.user == username && userReaction.reaction == reaction) == null)
-                {
-                    comment.reactions.Add(userReaction);
-                }
-                else
-                {
-                    comment.reactions.Remove(comment.reactions.Find(userReaction => userReaction.user == username && userReaction.reaction == reaction));
-                }
-
-                commentService.Update(commentId, comment);
-
-                return Accepted();
-            }
-
-            return NotFound("that reaction doesnt exist");
-        }*/
 
         [HttpPut("{commentId}/reactions")]
         [Authorize]
@@ -835,10 +560,10 @@ namespace Magnifier.Controllers
 
                 foreach (ScratchComment scratchComment in scratchCommentReplies)
                 {
-                    replies.Add(commentService.Create(new Comment(scratchComment.id, scratchComment, true, new List<Comment>())));
+                    replies.Add(commentService.Create(new Comment(scratchComment.id, scratchComment, Residence.Project, projectId.ToString(), true, new List<Comment>())));
                 }
 
-                comment = commentService.Create(new Comment(commentId, JsonConvert.DeserializeObject<ScratchComment>(await response.Content.ReadAsStringAsync()), false, replies));
+                comment = commentService.Create(new Comment(commentId, JsonConvert.DeserializeObject<ScratchComment>(await response.Content.ReadAsStringAsync()), Residence.Project, projectId.ToString(), false, replies));
             }
             else
             {
