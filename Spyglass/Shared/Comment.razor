@@ -1,5 +1,6 @@
 ﻿@using Magnifier.Models
 @using System.Net
+@using System.Text.RegularExpressions;
 @inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
 @inject HttpClient Http
 @inject IJSRuntime JsRuntime;
@@ -25,7 +26,7 @@
             <a href="https://magnifier.potatophant.net/users/@username" target="_blank" rel="noopener noreferrer" class="font-bold text-blue mb-2">@username</a>
             <div class="bg-white rounded-lg break-words w-full p-3">
                 <div>
-                    @content
+                    @parsedContent
                 </div>
                 <div class="text-grey text-xs mt-4">
                     @timeAgo
@@ -35,6 +36,16 @@
                 <ReactMenu projectId="@projectId" commentId="@commentId" comment="@comment" />
                 <div class="flex-grow" />
                 <div id="right-buttons" class="flex flex-row showOnCommentHover">
+                    <CommentButton onClick="@Star" bigger>
+                        @if (starred)
+                        {
+                            <span>★</span>
+                        }
+                        else
+                        {
+                            <span>☆</span>
+                        }
+                    </CommentButton>
                     <CommentButton onClick="@ViewOnScratch">View on Scratch</CommentButton>
                     <CommentButton onClick="@CopyLink">Copy Link</CommentButton>
                     <CommentButton onClick="@CopyId">Copy ID</CommentButton>
@@ -67,7 +78,7 @@ else
             <a href="https://magnifier.potatophant.net/users/@username" target="_blank" rel="noopener noreferrer" class="font-bold text-blue mb-2">@username</a>
             <div class="bg-white rounded-lg break-words w-full p-3">
                 <div>
-                    @content
+                    @parsedContent
                 </div>
                 <div class="text-grey text-xs mt-4">
                     @timeAgo
@@ -77,6 +88,16 @@ else
                 <ReactMenu projectId="@projectId" commentId="@commentId" comment="@comment" />
                 <div class="flex-grow" />
                 <div id="right-buttons" class="flex flex-row showOnCommentHover">
+                    <CommentButton onClick="@Star" bigger>
+                        @if (starred)
+                        {
+                            <span>★</span>
+                        }
+                        else
+                        {
+                            <span>☆</span>
+                        }
+                    </CommentButton>
                     <CommentButton onClick="@ViewOnScratch">View on Scratch</CommentButton>
                     <CommentButton onClick="@CopyLink">Copy Link</CommentButton>
                     <CommentButton onClick="@CopyId">Copy ID</CommentButton>
@@ -126,6 +147,11 @@ else
     [Parameter]
     public List<Magnifier.Models.Comment> replys { get; set; } // the compiler was bullying me for some reason so i had to change this to "replys" instead of "replies"
 
+    [Parameter]
+    public bool starred { get; set; }
+
+    private MarkupString parsedContent;
+
     private string timeAgo;
 
     private readonly List<Magnifier.Models.Comment> emptyReplyList = new List<Magnifier.Models.Comment>();
@@ -161,12 +187,25 @@ else
         else if (ts.TotalDays > 365000) // 1 millenium
             timeAgo = $"oh wow magnifiers old. is hytale out yet?";
 
+        Regex exp = new Regex(@"(?<=(^|[\s.,!])(?!\S*[:#]))[@|＠][A-Za-z0-9_-]{1,20}(?=(?:\b(?!@|＠)|$))");
+
+        parsedContent = new MarkupString(exp.Replace(content, mention => $"<a href=\"https://scratch.mit.edu/users/{mention.Value.Substring(1)}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"font-bold text-blue mb-2\">{mention.Value}</a>"));
+
         foreach (Magnifier.Models.Comment reply in replys)
         {
             reply.comment.content = WebUtility.HtmlDecode(reply.comment.content);
         }
 
         hasInitialised = true;
+    }
+
+    public void Star()
+    {
+        starred ^= true;
+
+        /*HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"https://magnifier-api.potatophant.net/api/Comments/{commentId}/reactions?reaction={reaction}");
+        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", LocalStorage.GetItem<string>("token"));
+        await Http.SendAsync(request);*/
     }
 
     public void ViewOnScratch()
@@ -196,10 +235,5 @@ else
     public async Task CopyId()
     {
         await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", commentId);
-    }
-
-    public async Task Report()
-    {
-        await JsRuntime.InvokeVoidAsync("alert", "Report");
     }
 }
