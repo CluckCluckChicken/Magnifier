@@ -23,10 +23,10 @@ else
             @switch (SettingsService.settings.embedPlayer)
             {
                 case Models.EmbedPlayer.Scratch:
-                    <iframe src="https://turbowarp.org/@projectId/embed?username={@AuthenticationService.user.username}" allowtransparency="true" width="485" height="402" frameborder="0" scrolling="no" allowfullscreen></iframe>
+                    <iframe src="https://scratch.mit.edu/projects/@projectId/embed" allowtransparency="true" width="485" height="402" frameborder="0" scrolling="no" allowfullscreen></iframe>
                     break;
                 case Models.EmbedPlayer.TurboWarp:
-                    <iframe src="https://scratch.mit.edu/projects/@projectId/embed" allowtransparency="true" width="485" height="402" frameborder="0" scrolling="no" allowfullscreen></iframe>
+                    <iframe src="https://turbowarp.org/@projectId/embed?username={@AuthenticationService.user.username}" allowtransparency="true" width="485" height="402" frameborder="0" scrolling="no" allowfullscreen></iframe>
                 break;
             }
         </div>
