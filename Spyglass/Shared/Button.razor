@@ -1,4 +1,11 @@
-﻿<button @onclick="@onClick" class="transition duration-300 bg-primary hover:bg-primaryHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3 m-2">@ChildContent</button>
+﻿@if (primary)
+{
+    <button @onclick="@onClick" class="transition duration-300 bg-primary hover:bg-primaryHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3 m-2">@ChildContent</button>
+}
+else
+{
+    <button @onclick="@onClick" class="transition duration-300 bg-white hover:bg-whiteHover active:outline-none focus:outline-none text-black font-dosis text-4xl rounded-2xl p-3 m-2">@ChildContent</button>
+}
 
 @code {
     [Parameter]
@@ -6,4 +13,7 @@
 
     [Parameter]
     public EventCallback onClick { get; set; }
+
+    [Parameter]
+    public bool primary { get; set; }
 }

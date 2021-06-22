@@ -44,7 +44,7 @@ namespace Spyglass.Services
         {
             if (settings == null)
             {
-                settings = new Settings(EmbedPlayer.Scratch);
+                settings = new Settings();
             }
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"https://magnifier-api.potatophant.net/api/Auth/settings?settings={System.Text.Json.JsonSerializer.Serialize(settings)}");

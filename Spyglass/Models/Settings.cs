@@ -13,6 +13,11 @@ namespace Spyglass.Models
 
     public record Settings
     {
+        public Settings()
+        {
+            embedPlayer = EmbedPlayer.Scratch;
+        }
+
         public Settings(EmbedPlayer embedPlayer)
         {
             this.embedPlayer = embedPlayer;

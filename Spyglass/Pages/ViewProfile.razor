@@ -17,7 +17,12 @@ else
     {
         <PageTitle Title="on Magnifier" />
 
+        <div class="flex flex-col justify-center items-center">
+            <NavLink href="settings"><Button>Settings</Button></NavLink>
+        </div>
+
         <div class="flex flex-col justify-center items-center mt-8">
+            <Heading size="2">Comments</Heading>
 
             @foreach (Magnifier.Models.Comment comment in comments)
             {
@@ -33,7 +38,7 @@ else
             }
             else
             {
-                <Button onClick="@LoadMore">Load More</Button>
+                <Button onClick="@LoadMore" primary>Load More</Button>
             }
         </div>
 
