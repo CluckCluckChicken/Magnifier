@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Spyglass.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -17,7 +18,7 @@ namespace Magnifier.Models
             this.lastLogin = lastLogin;
         }
 
-        public string id { get; set; }
+        // User info
 
         public string username { get; set; } // This user's Scratch username
 
@@ -27,5 +28,11 @@ namespace Magnifier.Models
 
         public DateTime created { get; set; } // When this user's account was created
         public DateTime lastLogin { get; set; } // When this user last logged into their account
+
+        // Other stuff
+
+        public Settings settings { get; set; }
+
+        public List<int> stars { get; set; } // List of ids of the comments that this user has starred
     }
 }

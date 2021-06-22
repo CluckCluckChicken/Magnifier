@@ -23,6 +23,8 @@ namespace Magnifier.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string id { get; set; }
 
+        // User info
+
         public string username { get; set; } // This user's Scratch username
 
         public ScratchCommentAuthor scratchUser { get; set; } // This user's Scratch profile
@@ -33,5 +35,11 @@ namespace Magnifier.Models
 
         public DateTime created { get; private set; } // When this user's account was created
         public DateTime lastLogin { get; set; } // When this user last logged into their account
+
+        // Other stuff
+        
+        public Settings settings { get; set; }
+
+        public List<int> stars { get; set; } // List of ids of the comments that this user has starred
     }
 }

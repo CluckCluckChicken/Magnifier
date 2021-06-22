@@ -27,6 +27,7 @@ namespace Spyglass.Services
         public void Initialize()
         {
             user = LocalStorage.GetItem<User>("user");
+            token = LocalStorage.GetItem<string>("token");
         }
 
         public async Task<AuthenticationResponse> Login(string authCode)
@@ -51,7 +52,7 @@ namespace Spyglass.Services
 
             LocalStorage.SetItem("user", user);
 
-            return new AuthenticationResponse(response, token); ;
+            return new AuthenticationResponse(response, token);
         }
 
         public void Logout()

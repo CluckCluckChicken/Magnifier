@@ -227,10 +227,8 @@ namespace Magnifier.Controllers
                     else
                     {
                         Comment c = dbComments.Find(dbComment => dbComment.commentId == comment.commentId);
-                        c.residence = comment.residence;
-                        c.residenceId = comment.residenceId;
-                        c.replies = comment.replies;
-                        commentService.Update(comment.commentId, c);
+                        comment.reactions = c.reactions;
+                        commentService.Update(comment.commentId, comment);
                     }
                 }
             });
@@ -478,29 +476,27 @@ namespace Magnifier.Controllers
         [Authorize]
         public ActionResult PutReaction(int commentId, string reaction)
         {
-            User user = userService.Get(HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value);
-
-            if (user.isBanned)
-            {
-                return Forbid();
-            }
-
-            Comment comment;
-
-            if (commentService.Get(commentId) == null)
-            {
-                return NotFound("that comment doesnt exist");
-            }
-
-            comment = commentService.Get(commentId);
-
-            if (comment.reactions == null)
-            {
-                comment.reactions = new List<UserReaction>();
-            }
-
             if (reactionService.Get(reaction) != null)
             {
+                User user = userService.Get(HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value);
+
+                if (user.isBanned)
+                {
+                    return Forbid();
+                }
+
+                Comment comment = commentService.Get(commentId);
+
+                if (comment == null)
+                {
+                    comment = commentService.Create(new Comment(commentId, null, Residence.Project, "", false, new List<Comment>()));
+                }
+
+                if (comment.reactions == null)
+                {
+                    comment.reactions = new List<UserReaction>();
+                }
+
                 string username = HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value;
 
                 UserReaction userReaction = new UserReaction(username, reaction);
@@ -577,5 +573,10 @@ namespace Magnifier.Controllers
             return Accepted();
         }
 
+        [HttpPut("{commentId}/stars")]
+        public void StarComment(int commentId)
+        {
+
+        }
     }
 }

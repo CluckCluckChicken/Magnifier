@@ -136,5 +136,49 @@ namespace Magnifier.Models
 
             return NotFound();
         }
+
+        [HttpGet("settings")]
+        [Authorize]
+        public ActionResult GetSettings()
+        {
+            User user = userService.Get(HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value);
+
+            if (user.isBanned)
+            {
+                return Forbid();
+            }
+
+            if (user != null)
+            {
+                return Ok(JsonConvert.SerializeObject(user.settings));
+            }
+
+            return NotFound();
+        }
+
+        [HttpPut("settings")]
+        [Authorize]
+        public ActionResult UpdateSettings(string settings)
+        {
+            User user = userService.Get(HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value);
+
+            Settings deserialized = JsonConvert.DeserializeObject<Settings>(settings);
+
+            if (user.isBanned)
+            {
+                return Forbid();
+            }
+
+            if (user != null)
+            {
+                user.settings = deserialized;
+
+                userService.Update(user.username, user);
+
+                return Accepted();
+            }
+
+            return NotFound();
+        }
     }
 }

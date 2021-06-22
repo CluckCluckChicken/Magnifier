@@ -35,6 +35,8 @@ namespace Magnifier.Models
         [BsonIgnoreIfDefault]
         public string _id { get; set; }
 
+        // User info
+
         public int commentId { get; set; }
 
         public ScratchComment comment { get; set; }
@@ -50,5 +52,9 @@ namespace Magnifier.Models
         public bool isReply { get; set; }
 
         public List<Comment> replies { get; set; }
+
+        // Other stuff
+
+        public List<int> stars { get; set; } // List of ids of the comments that this user has starred
     }
 }
