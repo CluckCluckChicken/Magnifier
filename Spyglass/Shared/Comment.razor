@@ -189,7 +189,7 @@ else
 
         Regex exp = new Regex(@"(?<=(^|[\s.,!])(?!\S*[:#]))[@|＠][A-Za-z0-9_-]{1,20}(?=(?:\b(?!@|＠)|$))");
 
-        parsedContent = new MarkupString(exp.Replace(content, mention => $"<a href=\"https://magnifier.potatophant.net/users/{mention.Value.Substring(1)}\" class=\"font-bold text-blue mb-2\">{mention.Value}</a>"));
+        parsedContent = new MarkupString(exp.Replace(content, mention => $"<a href=\"users/{mention.Value.Substring(1)}\" onclick=\"window.location.href = 'users/{mention.Value.Substring(1)}'\" class=\"font-bold text-blue mb-2\">{mention.Value}</a>"));
 
         foreach (Magnifier.Models.Comment reply in replys)
         {
