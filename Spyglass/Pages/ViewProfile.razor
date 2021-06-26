@@ -171,6 +171,11 @@ else
         await JSRuntime.InvokeVoidAsync("bioWiwoLinks");
     }
 
+    protected override async Task OnParametersSetAsync()
+    {
+        await OnInitializedAsync();
+    }
+
     private async Task LoadMore()
     {
         loadingMore = true;
