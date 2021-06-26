@@ -20434,6 +20434,14 @@ video {
   src: url('../fonts/DidactGothic.ttf') format('truetype');
 }
 
+#bioWiwo a {
+  font-weight: 700;
+  --text-opacity: 1;
+  color: #3498db;
+  color: rgba(52, 152, 219, var(--text-opacity));
+  margin-bottom: 0.5rem;
+}
+
 #blazor-error-ui {
   background: lightyellow;
   bottom: 0;
