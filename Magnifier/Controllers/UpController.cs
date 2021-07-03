@@ -11,7 +11,13 @@ namespace Magnifier.Controllers
     [ApiController]
     public class UpController : ControllerBase
     {
+        /// <summary>
+        /// something stupid
+        /// </summary>
+        /// <returns></returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("up")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public ActionResult GetUp()
         {
             return NoContent();

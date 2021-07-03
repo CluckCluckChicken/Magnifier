@@ -30,7 +30,12 @@ namespace Magnifier.Models
             userService = _userService;
         }
 
+        /// <summary>
+        /// Get an auth code for use
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("code")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult GenerateCode()
         {
             string consonants = "BCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz";
@@ -48,7 +53,15 @@ namespace Magnifier.Models
             return Ok(result);
         }
 
+        /// <summary>
+        /// Get an auth token from a commented code
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
         [HttpGet("token")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult> GetTokenAsync(string code)
         {
             foreach (AuthCode authCode in authCodeService.Get())
@@ -118,8 +131,15 @@ namespace Magnifier.Models
             return Unauthorized();
         }
 
+        /// <summary>
+        /// Get the currently logged in user
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("user")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult GetUser()
         {
             User user = userService.Get(HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value);
@@ -137,8 +157,15 @@ namespace Magnifier.Models
             return NotFound();
         }
 
+        /// <summary>
+        /// Get the currently logged in user's settings
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("settings")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult GetSettings()
         {
             User user = userService.Get(HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value);
@@ -156,8 +183,16 @@ namespace Magnifier.Models
             return NotFound();
         }
 
+        /// <summary>
+        /// Update the currently logged in user's settings
+        /// </summary>
+        /// <returns></returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPut("settings")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult UpdateSettings(string settings)
         {
             User user = userService.Get(HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value);

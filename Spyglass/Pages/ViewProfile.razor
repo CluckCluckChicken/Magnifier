@@ -173,7 +173,12 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
+        page = 1;
+        loadingMore = false;
+
         await OnInitializedAsync();
+
+        StateHasChanged();
     }
 
     private async Task LoadMore()

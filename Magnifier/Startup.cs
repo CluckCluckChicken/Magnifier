@@ -14,8 +14,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -81,12 +83,19 @@ namespace Magnifier
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Magnifier", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo {
+                    Title = "Magnifier",
+                    Description = "An API for working with Scratch comments, and interacting with Magnifier.",
+                    License = new OpenApiLicense
+                    {
+                        Name = "yo mamma license",
+                        Url = new Uri("https://www.youtube.com/watch?v=OWWu05YYbNI")
+                    },
+                    Version = "v1"
+                });
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
-                      Enter 'Bearer' [space] and then your token in the text input below.
-                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+                    Description = "Enter \"Bearer {your auth token}\" to authenticate pls.",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey,
@@ -111,6 +120,11 @@ namespace Magnifier
                     new List<string>()
                     }
                 });
+
+                string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+                c.IncludeXmlComments(xmlPath);
             });
         }
 

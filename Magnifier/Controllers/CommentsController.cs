@@ -2,6 +2,7 @@
 using Magnifier.Models;
 using Magnifier.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
@@ -86,7 +87,14 @@ namespace Magnifier.Controllers
             return new ScratchRequestResponse(response, _comments: replies);
         }
 
+        /// <summary>
+        /// Get a comment from its id
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <returns></returns>
         [HttpGet("{commentId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult GetComment(int commentId)
         {
             Comment comment = commentService.Get(commentId);
@@ -99,7 +107,13 @@ namespace Magnifier.Controllers
             return Ok(comment);
         }
 
+        /// <summary>
+        /// Get a comment's reactions
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <returns></returns>
         [HttpGet("{commentId}/reactions")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult GetCommentReactions(int commentId)
         {
             Comment comment = commentService.Get(commentId);
@@ -112,7 +126,14 @@ namespace Magnifier.Controllers
             return Ok(comment.reactions);
         }
 
+        /// <summary>
+        /// Check if a Scratch project exists
+        /// </summary>
+        /// <param name="projectId"></param>
+        /// <returns></returns>
         [HttpGet("projects/{projectId}/exists")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> GetIfProjectExistsAsync(int projectId)
         {
             ScratchRequestResponse requestResponse = await GetScratchProject(projectId);
@@ -125,7 +146,14 @@ namespace Magnifier.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Check if a Scratch user exists
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
         [HttpGet("users/{username}/exists")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> GetIfUserExistsAsync(string username)
         {
             HttpResponseMessage response = await client.GetAsync($"https://scratch.mit.edu/users/{username}/");
@@ -138,7 +166,14 @@ namespace Magnifier.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Check if a Scratch studio exists
+        /// </summary>
+        /// <param name="studioId"></param>
+        /// <returns></returns>
         [HttpGet("studios/{studioId}/exists")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> GetIfStudioExistsAsync(int studioId)
         {
             HttpResponseMessage response = await client.GetAsync($"https://scratch.mit.edu/studios/{studioId}/");
@@ -151,7 +186,16 @@ namespace Magnifier.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Get the comments on a project
+        /// </summary>
+        /// <param name="projectId"></param>
+        ///<param name="page"></param>
+        /// <returns></returns>
         [HttpGet("projects/{projectId}/{page}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> GetProjectCommentsAsync(int projectId, int page)
         {
             ScratchRequestResponse requestResponse = await GetScratchProject(projectId);
@@ -244,7 +288,16 @@ namespace Magnifier.Controllers
             return Ok(JsonConvert.SerializeObject(comments));
         }
 
+        /// <summary>
+        /// Get the comments on a user profile
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
         [HttpGet("users/{username}/{page}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> GetUserCommentsAsync(string username, int page)
         {
             string response;
@@ -358,7 +411,16 @@ namespace Magnifier.Controllers
             return Ok(JsonConvert.SerializeObject(comments));
         }
 
+        /// <summary>
+        /// Get the comments on a studio
+        /// </summary>
+        /// <param name="studioId"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
         [HttpGet("studios/{studioId}/{page}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> GetStudioCommentsAsync(int studioId, int page)
         {
             string response;
@@ -472,8 +534,17 @@ namespace Magnifier.Controllers
             return Ok(JsonConvert.SerializeObject(comments));
         }
 
+        /// <summary>
+        /// React to a comment
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <returns></returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPut("{commentId}/reactions")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult PutReaction(int commentId, string reaction)
         {
             if (reactionService.Get(reaction) != null)
@@ -518,8 +589,11 @@ namespace Magnifier.Controllers
             return NotFound("that reaction doesnt exist");
         }
 
-        [HttpPut("{projectId}/{commentId}/pin")]
+        /*[HttpPut("{projectId}/{commentId}/pin")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> PinCommentAsync(int projectId, int commentId, bool pin = true)
         {
             ScratchRequestResponse requestResponse = await GetScratchProject(projectId);
@@ -571,12 +645,51 @@ namespace Magnifier.Controllers
             commentService.Update(commentId, comment);
 
             return Accepted();
+        }*/
+
+        /// <summary>
+        /// Get all the stars for the logged in user
+        /// </summary>
+        /// <returns></returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [HttpGet("stars")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public ActionResult GetStars()
+        {
+            User user = userService.Get(HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value);
+
+            if (user.isBanned)
+            {
+                return Forbid();
+            }
+
+            return Ok(JsonConvert.SerializeObject(user.stars));
         }
 
+        /// <summary>
+        /// Star/unstar a comment
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <returns></returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPut("{commentId}/stars")]
-        public void StarComment(int commentId)
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public ActionResult StarComment(int commentId)
         {
+            User user = userService.Get(HttpContext.User.Claims.ToList().Find(claim => claim.Type == "username").Value);
 
+            if (user.isBanned)
+            {
+                return Forbid();
+            }
+
+            user.stars.Add(commentId);
+
+            return Accepted();
         }
     }
 }
