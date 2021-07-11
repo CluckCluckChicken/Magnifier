@@ -101,6 +101,12 @@
             <param name="commentId"></param>
             <returns></returns>
         </member>
+        <member name="M:Magnifier.Controllers.CommentsController.GetStars">
+            <summary>
+            Get all the stars for the logged in user
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Magnifier.Controllers.CommentsController.StarComment(System.Int32)">
             <summary>
             Star/unstar a comment
