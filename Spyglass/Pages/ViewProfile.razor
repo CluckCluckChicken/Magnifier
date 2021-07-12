@@ -70,9 +70,12 @@ else
             </div>
             <div class="flex-grow"></div>
             <div class="flex flex-col">
-                @if (AuthenticationService.user.username == username)
+                @if (AuthenticationService.user != null)
                 {
-                    <NavLink href="settings"><Button>Settings</Button></NavLink>
+                    if (AuthenticationService.user.username == username)
+                    {
+                        <NavLink href="settings"><Button>Settings</Button></NavLink>
+                    }
                 }
                 <a href="https://scratch.mit.edu/users/@user.Username"><Button>View on Scratch</Button></a>
             </div>

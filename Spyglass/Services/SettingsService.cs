@@ -25,18 +25,21 @@ namespace Spyglass.Services
 
         public async Task Load()
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"https://magnifier-api.potatophant.net/api/Auth/settings");
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AuthenticationService.token);
-            HttpResponseMessage response = await Http.SendAsync(request);
-            string json = await response.Content.ReadAsStringAsync();
-
-            settings = System.Text.Json.JsonSerializer.Deserialize<Settings>(json);
-
-            if (settings == null)
+            if (AuthenticationService.user != null)
             {
-                await Save();
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"https://magnifier-api.potatophant.net/api/Auth/settings");
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AuthenticationService.token);
+                HttpResponseMessage response = await Http.SendAsync(request);
+                string json = await response.Content.ReadAsStringAsync();
 
-                await Load();
+                settings = System.Text.Json.JsonSerializer.Deserialize<Settings>(json);
+
+                if (settings == null)
+                {
+                    await Save();
+
+                    await Load();
+                }
             }
         }
 
