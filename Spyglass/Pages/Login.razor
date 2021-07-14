@@ -1,8 +1,9 @@
 ﻿@page "/login"
 @using Models
 @using Services
-@inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
+@inject AppSettings AppSettings
 @inject AuthenticationService AuthenticationService
+@inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
@@ -35,7 +36,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        authCode = await Http.GetStringAsync($"https://magnifier-api.potatophant.net/api/Auth/code");
+        authCode = await Http.GetStringAsync($"{AppSettings.ApiRoot}/Auth/code");
     }
 
     private async Task ShowAuthProject()

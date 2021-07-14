@@ -1,5 +1,8 @@
 ﻿@page "/browse"
+@using Services
+@inject AppSettings AppSettings 
 @inject HttpClient Http
+@inject Microsoft.Extensions.Configuration.IConfiguration config
 @inject NavigationManager NavigationManager
 
 <PageTitle Title="Browse Magnifier" />
@@ -51,10 +54,15 @@
     private string profileProgress;
     private string studioProgress;
 
+    protected override void OnInitialized()
+    {
+        Console.WriteLine(config["ApiRoot"]);
+    }
+
     private async Task ViewProjectComments()
     {
         projectProgress = "Checking if project exists...";
-        var project = await Http.GetAsync($"https://magnifier-api.potatophant.net/api/Comments/projects/{projectQuery.id}/exists");
+        var project = await Http.GetAsync($"{AppSettings.ApiRoot}/Comments/projects/{projectQuery.id}/exists");
         if (project.StatusCode != System.Net.HttpStatusCode.OK || projectQuery.id == "")
         {
             projectExists = false;
@@ -70,7 +78,7 @@
     private async Task ViewProfileComments()
     {
         profileProgress = "Checking if user exists...";
-        var project = await Http.GetAsync($"https://magnifier-api.potatophant.net/api/Comments/users/{profileQuery.id}/exists");
+        var project = await Http.GetAsync($"{AppSettings.ApiRoot}/Comments/users/{profileQuery.id}/exists");
         if (project.StatusCode != System.Net.HttpStatusCode.OK || profileQuery.id == "")
         {
             profileExists = false;
@@ -86,7 +94,7 @@
     private async Task ViewStudioComments()
     {
         studioProgress = "Checking if studio exists...";
-        var project = await Http.GetAsync($"https://magnifier-api.potatophant.net/api/Comments/studios/{studioQuery.id}/exists");
+        var project = await Http.GetAsync($"{AppSettings.ApiRoot}/Comments/studios/{studioQuery.id}/exists");
         if (project.StatusCode != System.Net.HttpStatusCode.OK || studioQuery.id == "")
         {
             studioExists = false;

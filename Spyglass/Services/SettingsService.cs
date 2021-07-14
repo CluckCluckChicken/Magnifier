@@ -11,14 +11,17 @@ namespace Spyglass.Services
 {
     public class SettingsService
     {
+        private AppSettings AppSettings;
+
         private HttpClient Http;
 
         private AuthenticationService AuthenticationService;
 
         public Settings settings;
 
-        public SettingsService(HttpClient _Http, AuthenticationService _authenticationService)
+        public SettingsService(AppSettings _AppSettings, HttpClient _Http, AuthenticationService _authenticationService)
         {
+            AppSettings = _AppSettings;
             Http = _Http;
             AuthenticationService = _authenticationService;
         }
@@ -27,7 +30,7 @@ namespace Spyglass.Services
         {
             if (AuthenticationService.user != null)
             {
-                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"https://magnifier-api.potatophant.net/api/Auth/settings");
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"{AppSettings.ApiRoot}/Auth/settings");
                 request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AuthenticationService.token);
                 HttpResponseMessage response = await Http.SendAsync(request);
                 string json = await response.Content.ReadAsStringAsync();
@@ -50,7 +53,7 @@ namespace Spyglass.Services
                 settings = new Settings();
             }
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"https://magnifier-api.potatophant.net/api/Auth/settings?settings={System.Text.Json.JsonSerializer.Serialize(settings)}");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"{AppSettings.ApiRoot}/Auth/settings?settings={System.Text.Json.JsonSerializer.Serialize(settings)}");
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AuthenticationService.token);
             HttpResponseMessage response = await Http.SendAsync(request);
         }

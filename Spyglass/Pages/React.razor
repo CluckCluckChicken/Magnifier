@@ -2,6 +2,7 @@
 @page "/react/{commentId}/{name}"
 @using Magnifier.Models
 @using Services
+@inject AppSettings AppSettings
 @inject AuthenticationService AuthenticationService
 @inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
 @inject HttpClient Http
@@ -27,14 +28,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        reaction = await Http.GetFromJsonAsync<Reaction>($"https://magnifier-api.potatophant.net/api/Reactions/{name}");
+        reaction = await Http.GetFromJsonAsync<Reaction>($"{AppSettings.ApiRoot}/Reactions/{name}");
 
         hasInitialized = true;
     }
 
     private async Task Yes()
     {
-        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"https://magnifier-api.potatophant.net/api/Comments/{commentId}/reactions?reaction={name}");
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"{AppSettings.ApiRoot}/Comments/{commentId}/reactions?reaction={name}");
         request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", LocalStorage.GetItem<string>("token"));
         await Http.SendAsync(request);
 

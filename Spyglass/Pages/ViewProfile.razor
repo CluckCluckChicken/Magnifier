@@ -6,9 +6,10 @@
 @using System.Net
 @using System.Net.Http
 @using System.Text.RegularExpressions;
+@inject AppSettings AppSettings
 @inject AuthenticationService AuthenticationService
 @inject HttpClient Http
-@inject IJSRuntime JSRuntime  
+@inject IJSRuntime JSRuntime
 @inject ReactionService ReactionService
 
 @if (string.IsNullOrEmpty(username))
@@ -149,7 +150,7 @@ else
 
             ocular = await Http.GetFromJsonAsync<OcularUser>($"https://my-ocular.jeffalo.net/api/user/{username}");
 
-            comments = await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://magnifier-api.potatophant.net/api/Comments/users/{username}/1");
+            comments = await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"{AppSettings.ApiRoot}/Comments/users/{username}/1");
 
             foreach (Magnifier.Models.Comment comment in comments)
             {
@@ -190,7 +191,7 @@ else
 
         page++;
 
-        comments = comments.Concat(await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://magnifier-api.potatophant.net/api/Comments/users/{username}/{page}")).ToList();
+        comments = comments.Concat(await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"{AppSettings.ApiRoot}/Comments/users/{username}/{page}")).ToList();
 
         foreach (Magnifier.Models.Comment comment in comments)
         {
