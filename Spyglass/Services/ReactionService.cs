@@ -12,18 +12,21 @@ namespace Spyglass.Services
 {
     public class ReactionService
     {
+        private AppSettings AppSettings;
+
         private HttpClient Http;
 
         public List<Reaction> reactions;
 
-        public ReactionService(HttpClient _Http)
+        public ReactionService(AppSettings _AppSettings, HttpClient _Http)
         {
+            AppSettings = _AppSettings;
             Http = _Http;
         }
 
         public async Task Initialize()
         {
-            reactions = await Http.GetFromJsonAsync<List<Reaction>>($"https://magnifier-api.potatophant.net/api/Reactions");
+            reactions = await Http.GetFromJsonAsync<List<Reaction>>($"{AppSettings.ApiRoot}/Reactions");
         }
     }
 }

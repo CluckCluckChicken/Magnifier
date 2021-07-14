@@ -4,6 +4,7 @@
 @using Services
 @using System.Net
 @using System.Net.Http
+@inject AppSettings AppSettings 
 @inject HttpClient Http
 @inject ReactionService ReactionService
 
@@ -65,7 +66,7 @@ else
         {
             await ReactionService.Initialize();
 
-            comments = await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://magnifier-api.potatophant.net/api/Comments/studios/{studioId}/1");
+            comments = await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"{AppSettings.ApiRoot}/Comments/studios/{studioId}/1");
 
             foreach (Magnifier.Models.Comment comment in comments)
             {
@@ -91,7 +92,7 @@ else
 
         page++;
 
-        comments = comments.Concat(await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://magnifier-api.potatophant.net/api/Comments/studios/{studioId}/{page}")).ToList();
+        comments = comments.Concat(await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"{AppSettings.ApiRoot}/Comments/studios/{studioId}/{page}")).ToList();
 
         foreach (Magnifier.Models.Comment comment in comments)
         {

@@ -1,9 +1,11 @@
 ﻿@using Magnifier.Models
+@using Services
 @using System.Net
 @using System.Text.RegularExpressions;
+@inject AppSettings AppSettings
 @inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
 @inject HttpClient Http
-@inject IJSRuntime JsRuntime;
+@inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 
 <style>
@@ -203,7 +205,7 @@ else
     {
         starred ^= true;
 
-        /*HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"https://magnifier-api.potatophant.net/api/Comments/{commentId}/reactions?reaction={reaction}");
+        /*HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"{AppSettings.ApiRoot}/Comments/{commentId}/reactions?reaction={reaction}");
         request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", LocalStorage.GetItem<string>("token"));
         await Http.SendAsync(request);*/
     }

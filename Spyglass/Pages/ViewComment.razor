@@ -3,6 +3,7 @@
 @using Services
 @using System.Net
 @using System.Net.Http
+@inject AppSettings AppSettings
 @inject AuthenticationService AuthenticationService
 @inject HttpClient Http
 @inject ReactionService ReactionService
@@ -35,7 +36,7 @@ else
             AuthenticationService.Initialize();
             await ReactionService.Initialize();
 
-            comment = await Http.GetFromJsonAsync<Magnifier.Models.Comment>($"https://magnifier-api.potatophant.net/api/Comments/{commentId}");
+            comment = await Http.GetFromJsonAsync<Magnifier.Models.Comment>($"{AppSettings.ApiRoot}/Comments/{commentId}");
 
             comment.comment.content = WebUtility.HtmlDecode(comment.comment.content);
         }
