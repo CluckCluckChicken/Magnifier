@@ -26,6 +26,9 @@ namespace Spyglass.Services
 
         public async Task Initialize()
         {
+            Console.WriteLine("ApiRoot: " + AppSettings.ApiRoot);
+            var r = await Http.GetAsync($"{AppSettings.ApiRoot}/Reactions");
+            Console.WriteLine(await r.Content.ReadAsStringAsync());
             reactions = await Http.GetFromJsonAsync<List<Reaction>>($"{AppSettings.ApiRoot}/Reactions");
         }
     }

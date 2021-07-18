@@ -36,6 +36,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Console.WriteLine(AppSettings.ApiRoot);
         authCode = await Http.GetStringAsync($"{AppSettings.ApiRoot}/Auth/code");
     }
 

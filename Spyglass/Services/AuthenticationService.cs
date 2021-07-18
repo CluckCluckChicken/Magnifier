@@ -28,8 +28,11 @@ namespace Spyglass.Services
 
         public void Initialize()
         {
-            user = LocalStorage.GetItem<User>("user");
-            token = LocalStorage.GetItem<string>("token");
+            if (Environment.GetEnvironmentVariable("SPYGLASS_PRERENDER_CONTEXT") != "true")
+            {
+                user = LocalStorage.GetItem<User>("user");
+                token = LocalStorage.GetItem<string>("token");
+            }
         }
 
         public async Task<AuthenticationResponse> Login(string authCode)

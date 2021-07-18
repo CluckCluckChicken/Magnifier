@@ -1,7 +1,11 @@
-﻿@inject IJSRuntime JSRuntime;
+﻿@inject IJSRuntime JSRuntime
 
 @code {
+        [CascadingParameter]
+        bool hasRendered { get; set; }
+
     private String _title = "";
+
     [Parameter]
     public String Title
     {
@@ -17,13 +21,16 @@
     }
 
 
-    protected override void OnInitialized()
+    protected override void OnAfterRender(bool firstRender)
     {
         setTitle();
     }
 
     private void setTitle()
     {
-        JSRuntime.InvokeAsync<string>("setTitle", new object[] { this._title });
+        if (Environment.GetEnvironmentVariable("SPYGLASS_PRERENDER_CONTEXT") != "true")
+        {
+            JSRuntime.InvokeAsync<string>("setTitle", new object[] { this._title });
+        }
     }
 }

@@ -34,6 +34,7 @@ namespace Magnifier.Services
             {
                 comments.InsertOne(comment);
             }
+
             return comment;
         }
 

@@ -1,3 +1,27 @@
+﻿@page
+@namespace Spyglass.Server.Pages
+@using Spyglass
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!--<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prerendering client-side Blazor</title>
+    <base href="~/" />
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link href="css/site.css" rel="stylesheet" />
+</head>
+<body>
+    <app>
+        <component type="typeof(App)" render-mode="Static" />
+    </app>
+
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+</html>-->
+
 <!DOCTYPE html>
 <html>
 
@@ -12,14 +36,9 @@
 </head>
 
 <body class="bg-pureWhite text-black">
-    <div id="app">
-        <div class="p-4">
-            <div class="flex items-center flex-row">
-                <img src="/images/icon.png" class="animate-rotate w-20 h-20 mx-4" />
-                <h2 class="text-5xl text-@colour font-didactGothic">Loading...</h2>
-            </div>
-        </div>
-    </div>
+    <app>
+        <component type="typeof(App)" render-mode="WebAssemblyPrerendered" />
+    </app>
 
     <script>
         window.bioWiwoLinks = () => {
@@ -45,8 +64,6 @@
     </script>
 
     <!-- plausible analytics --><script async defer data-domain="magnifier-test.potatophant.net" src="https://analytics.potatophant.net/js/plausible.js"></script>
-
-    <!-- Cloudflare Web Analytics --><!--<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "56be9a23350644c3bac7e6a38c055f7b"}'></script>--><!-- End Cloudflare Web Analytics -->
 </body>
 
 </html>
