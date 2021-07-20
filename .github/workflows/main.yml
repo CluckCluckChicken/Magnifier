@@ -6,7 +6,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
+      - uses: actions/setup-node@latest
+        with:
+            node-version: 14.x
+            
+      - name: Generate CSS
+        run: |
+          cd Spyglass
+          npm install
+          npx gulp css
       - name: Publish .NET Core Project
         run: dotnet publish Spyglass -c Release -o release --nologo
       - name: Deploy
