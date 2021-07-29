@@ -1,7 +1,7 @@
 # Magnifier
 Scratch comment reactions
 
-Documentation can be found [here](https://magnifier.potatophant.net/docs)
+Documentation can be found [here](https://github.com/CluckCluckChicken/magnifier-docs/blob/main/index.md)
 
 ## Instructions
 The Magnifier backend consists of a C# ASP.NET Core Web API located in `Magnifier`.  
@@ -63,4 +63,4 @@ idk lol
 `Magnifier/Controllers` contains classes with endpoints.  
 `Magnifier/Models` contains classes to be used to store data.  
 `Magnifier/Services` contains singleton classes that can be used to access data and to do stuff.
-You can see the REST API Docs for Magnifier [here](https://CluckCluckChicken.github.io/Magnifier).
+You can see the REST API Docs for Magnifier [here](https://github.com/CluckCluckChicken/magnifier-docs/blob/main/index.md).
