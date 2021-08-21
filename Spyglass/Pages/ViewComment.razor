@@ -1,0 +1,46 @@
+﻿@page "/comments/{commentId}"
+@using Magnifier.Models
+@using Services
+@using System.Net
+@using System.Net.Http
+@inject AppSettings AppSettings
+@inject AuthenticationService AuthenticationService
+@inject HttpClient Http
+@inject ReactionService ReactionService
+@inject SettingsService SettingsService
+
+@if (string.IsNullOrEmpty(commentId))
+{
+    <p>no</p>
+}
+else
+{
+    if (hasInitialised)
+    {
+        <Comment commentId="@comment.commentId.ToString()" comment="@comment" icon="@comment.comment.author.image" username="@comment.comment.author.username" content="@comment.comment.content" dateCreated="@comment.comment.datetime_created" replys="@comment.replies" />
+    }
+}
+
+@code {
+    private bool hasInitialised = false;
+
+    [Parameter]
+    public string commentId { get; set; }
+
+    public Magnifier.Models.Comment comment { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(commentId))
+        {
+            AuthenticationService.Initialize();
+            await ReactionService.Initialize();
+
+            comment = await Http.GetFromJsonAsync<Magnifier.Models.Comment>($"{AppSettings.ApiRoot}/Comments/{commentId}");
+
+            comment.comment.content = WebUtility.HtmlDecode(comment.comment.content);
+        }
+
+        hasInitialised = true;
+    }
+}

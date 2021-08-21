@@ -1,8 +1,11 @@
 ﻿@using Magnifier.Models
+@using Services
 @using System.Net
+@using System.Text.RegularExpressions;
+@inject AppSettings AppSettings
 @inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
 @inject HttpClient Http
-@inject IJSRuntime JsRuntime;
+@inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 
 <style>
@@ -18,14 +21,14 @@
 @if (isTopLevel)
 {
     <div id="comments-@commentId" class="flex flex-row w-1/2">
-        <a href="https://scratch.mit.edu/users/@username" target="_blank" rel="noopener noreferrer" class="mr-2">
+        <a href="https://magnifier.potatophant.net/users/@username" target="_blank" rel="noopener noreferrer" class="mr-2">
             <img src="@icon" class="float-left rounded" style="width: 60px; height: 60px;" />
         </a>
         <div class="flex flex-col w-full mb-6" style="max-width: calc(100% - 60px - 4px);">
-            <a href="https://scratch.mit.edu/users/@username" target="_blank" rel="noopener noreferrer" class="font-bold text-blue mb-2">@username</a>
+            <a href="https://magnifier.potatophant.net/users/@username" target="_blank" rel="noopener noreferrer" class="font-bold text-blue mb-2">@username</a>
             <div class="bg-white rounded-lg break-words w-full p-3">
                 <div>
-                    @content
+                    @parsedContent
                 </div>
                 <div class="text-grey text-xs mt-4">
                     @timeAgo
@@ -35,6 +38,16 @@
                 <ReactMenu projectId="@projectId" commentId="@commentId" comment="@comment" />
                 <div class="flex-grow" />
                 <div id="right-buttons" class="flex flex-row showOnCommentHover">
+                    <CommentButton onClick="@Star" bigger>
+                        @if (starred)
+                        {
+                            <span>★</span>
+                        }
+                        else
+                        {
+                            <span>☆</span>
+                        }
+                    </CommentButton>
                     <CommentButton onClick="@ViewOnScratch">View on Scratch</CommentButton>
                     <CommentButton onClick="@CopyLink">Copy Link</CommentButton>
                     <CommentButton onClick="@CopyId">Copy ID</CommentButton>
@@ -60,14 +73,14 @@
 else
 {
     <div id="comments-@commentId" class="flex flex-row ml-16" style="width: calc(50% - 4rem);">
-        <a href="https://scratch.mit.edu/users/@username" target="_blank" rel="noopener noreferrer" class="mr-2">
+        <a href="https://magnifier.potatophant.net/users/@username" target="_blank" rel="noopener noreferrer" class="mr-2">
             <img src="@icon" class="float-left rounded" style="width: 60px; height: 60px;" />
         </a>
         <div class="flex flex-col w-full mb-6" style="max-width: calc(100% - 60px - 4px);">
-            <a href="https://scratch.mit.edu/users/@username" target="_blank" rel="noopener noreferrer" class="font-bold text-blue mb-2">@username</a>
+            <a href="https://magnifier.potatophant.net/users/@username" target="_blank" rel="noopener noreferrer" class="font-bold text-blue mb-2">@username</a>
             <div class="bg-white rounded-lg break-words w-full p-3">
                 <div>
-                    @content
+                    @parsedContent
                 </div>
                 <div class="text-grey text-xs mt-4">
                     @timeAgo
@@ -77,6 +90,16 @@ else
                 <ReactMenu projectId="@projectId" commentId="@commentId" comment="@comment" />
                 <div class="flex-grow" />
                 <div id="right-buttons" class="flex flex-row showOnCommentHover">
+                    <CommentButton onClick="@Star" bigger>
+                        @if (starred)
+                        {
+                            <span>★</span>
+                        }
+                        else
+                        {
+                            <span>☆</span>
+                        }
+                    </CommentButton>
                     <CommentButton onClick="@ViewOnScratch">View on Scratch</CommentButton>
                     <CommentButton onClick="@CopyLink">Copy Link</CommentButton>
                     <CommentButton onClick="@CopyId">Copy ID</CommentButton>
@@ -126,6 +149,11 @@ else
     [Parameter]
     public List<Magnifier.Models.Comment> replys { get; set; } // the compiler was bullying me for some reason so i had to change this to "replys" instead of "replies"
 
+    [Parameter]
+    public bool starred { get; set; }
+
+    private MarkupString parsedContent;
+
     private string timeAgo;
 
     private readonly List<Magnifier.Models.Comment> emptyReplyList = new List<Magnifier.Models.Comment>();
@@ -161,12 +189,25 @@ else
         else if (ts.TotalDays > 365000) // 1 millenium
             timeAgo = $"oh wow magnifiers old. is hytale out yet?";
 
+        Regex exp = new Regex(@"(?<=(^|[\s.,!])(?!\S*[:#]))[@|＠][A-Za-z0-9_-]{1,20}(?=(?:\b(?!@|＠)|$))");
+
+        parsedContent = new MarkupString(exp.Replace(content, mention => $"<a href=\"users/{mention.Value.Substring(1)}\" onclick=\"window.location.href = 'users/{mention.Value.Substring(1)}'\" class=\"font-bold text-blue mb-2\">{mention.Value}</a>"));
+
         foreach (Magnifier.Models.Comment reply in replys)
         {
             reply.comment.content = WebUtility.HtmlDecode(reply.comment.content);
         }
 
         hasInitialised = true;
+    }
+
+    public void Star()
+    {
+        starred ^= true;
+
+        /*HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"{AppSettings.ApiRoot}/Comments/{commentId}/reactions?reaction={reaction}");
+        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", LocalStorage.GetItem<string>("token"));
+        await Http.SendAsync(request);*/
     }
 
     public void ViewOnScratch()
@@ -196,10 +237,5 @@ else
     public async Task CopyId()
     {
         await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", commentId);
-    }
-
-    public async Task Report()
-    {
-        await JsRuntime.InvokeVoidAsync("alert", "Report");
     }
 }

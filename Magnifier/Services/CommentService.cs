@@ -45,5 +45,34 @@ namespace Magnifier.Services
 
         public void Remove(string id) =>
             comments.DeleteOne(comment => comment._id == id);
+
+        /*
+        {
+          "_id": {
+            "$oid": "60d00083927d820f4585918c"
+          },
+          "commentId": 147414923,
+          "comment": {
+            "_id": null,
+            "id": 147414923,
+            "content": "@IHaveToBlink  It&#39;s an extension, I can&#39;t tell the name of it because of https://scratch.mit.edu/discuss/topic/284272/",
+            "datetime_created": {
+              "$date": "2021-06-21T02:33:55.000Z"
+            },
+            "author": {
+              "_id": null,
+              "username": "Chiroyce",
+              "image": "//cdn2.scratch.mit.edu/get_image/user/58524660_60x60.png"
+            }
+          },
+          "residence": 1,
+          "residenceId": "Chiroyce",
+          "reactions": [],
+          "isPinned": false,
+          "isReply": true,
+          "replies": [],
+          "stars": null
+        }
+		*/
     }
 }

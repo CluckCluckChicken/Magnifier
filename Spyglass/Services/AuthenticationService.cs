@@ -11,6 +11,7 @@ namespace Spyglass.Services
 {
     public class AuthenticationService
     {
+        private AppSettings AppSettings;
         private HttpClient Http;
         private ISyncLocalStorageService LocalStorage;
 
@@ -18,8 +19,9 @@ namespace Spyglass.Services
 
         public string token;
 
-        public AuthenticationService(HttpClient _Http, ISyncLocalStorageService _LocalStorage)
+        public AuthenticationService(AppSettings _AppSettings, HttpClient _Http, ISyncLocalStorageService _LocalStorage)
         {
+            AppSettings = _AppSettings;
             Http = _Http;
             LocalStorage = _LocalStorage;
         }
@@ -27,11 +29,12 @@ namespace Spyglass.Services
         public void Initialize()
         {
             user = LocalStorage.GetItem<User>("user");
+            token = LocalStorage.GetItem<string>("token");
         }
 
         public async Task<AuthenticationResponse> Login(string authCode)
         {
-            HttpResponseMessage response = await Http.GetAsync($"https://magnifier-api.potatophant.net/api/Auth/token?code={authCode}");
+            HttpResponseMessage response = await Http.GetAsync($"{AppSettings.ApiRoot}/Auth/token?code={authCode}");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -42,7 +45,7 @@ namespace Spyglass.Services
 
             LocalStorage.SetItem("token", token);
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"https://magnifier-api.potatophant.net/api/Auth/user");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"{AppSettings.ApiRoot}/Auth/user");
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", LocalStorage.GetItem<string>("token"));
             HttpResponseMessage userResponse = await Http.SendAsync(request);
             string json = await userResponse.Content.ReadAsStringAsync();
@@ -51,7 +54,7 @@ namespace Spyglass.Services
 
             LocalStorage.SetItem("user", user);
 
-            return new AuthenticationResponse(response, token); ;
+            return new AuthenticationResponse(response, token);
         }
 
         public void Logout()

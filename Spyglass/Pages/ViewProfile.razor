@@ -1,10 +1,15 @@
 ﻿@page "/users"
 @page "/users/{username}"
 @using Magnifier.Models
+@using Models
 @using Services
 @using System.Net
 @using System.Net.Http
+@using System.Text.RegularExpressions;
+@inject AppSettings AppSettings
+@inject AuthenticationService AuthenticationService
 @inject HttpClient Http
+@inject IJSRuntime JSRuntime
 @inject ReactionService ReactionService
 
 @if (string.IsNullOrEmpty(username))
@@ -17,7 +22,68 @@ else
     {
         <PageTitle Title="on Magnifier" />
 
+        <div class="flex flex-row p-4">
+            <div class="flex flex-col">
+                <div class="flex flex-row">
+                    <img src="https://cdn2.scratch.mit.edu/get_image/user/@(user.Id)_96x96.png" class="inline rounded mr-2 mt-4" style="width: 96px; height: 96px;" />
+                    <div class="flex flex-col">
+                        <div class="flex flex-row">
+                            <Heading size="2" span>@user.Username</Heading>
+                            <span class="relative align-top text-grey" style="top: 1.25rem;">
+                                <Heading size="6" span>#@user.Id</Heading>
+                            </span>
+                        </div>
+                        <div class="flex flex-row">
+                            <span class="mr-2">
+                                <Heading size="6" span>@user.Status</Heading>
+                            </span>
+                            <Heading size="6" span>@user.Joined</Heading>
+                        </div>
+                        <div class="flex flex-row">
+                            <span class="mr-2">
+                                <Heading size="6" span>@user.Country</Heading>
+                            </span>
+                            <i><Heading size="6" span>@ocular.Status</Heading></i>
+                            <span class="align-bottom ml-1 mt-2" style="width: 10px; height: 10px; background-color: @ocular.Color; border-radius: 50%;"></span>
+                        </div>
+                    </div>
+                </div>
+                <div id="bioWiwo" class="flex flex-col max-w-xs">
+                    <div class="flex flex-col">
+                        <Heading size="3">About me</Heading>
+                        <Heading size="6">
+                            @foreach (string line in splitBio)
+                            {
+                                <p>@(new MarkupString(WebUtility.HtmlDecode(line)))</p>
+                            }
+                        </Heading>
+                    </div>
+                    <div class="flex flex-col">
+                        <Heading size="3">What I'm working on</Heading>
+                        <Heading size="6">
+                            @foreach (string line in splitWork)
+                            {
+                                <p>@(new MarkupString(WebUtility.HtmlDecode(line)))</p>
+                            }
+                        </Heading>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-grow"></div>
+            <div class="flex flex-col">
+                @if (AuthenticationService.user != null)
+                {
+                    if (AuthenticationService.user.username == username)
+                    {
+                        <NavLink href="settings"><Button>Settings</Button></NavLink>
+                    }
+                }
+                <a href="https://scratch.mit.edu/users/@user.Username"><Button>View on Scratch</Button></a>
+            </div>
+        </div>
+
         <div class="flex flex-col justify-center items-center mt-8">
+            <Heading size="2">Comments</Heading>
 
             @foreach (Magnifier.Models.Comment comment in comments)
             {
@@ -33,7 +99,7 @@ else
             }
             else
             {
-                <Button onClick="@LoadMore">Load More</Button>
+                <Button onClick="@LoadMore" primary>Load More</Button>
             }
         </div>
 
@@ -53,7 +119,15 @@ else
     [Parameter]
     public string username { get; set; }
 
+    public ScratchUser user { get; set; }
+
     public List<Magnifier.Models.Comment> comments { get; set; }
+
+    private OcularUser ocular { get; set; }
+
+    private string[] splitBio { get; set; }
+
+    private string[] splitWork { get; set; }
 
     private int page = 1;
 
@@ -63,9 +137,20 @@ else
     {
         if (!string.IsNullOrEmpty(username))
         {
+            AuthenticationService.Initialize();
             await ReactionService.Initialize();
 
-            comments = await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://magnifier-api.potatophant.net/api/Comments/users/{username}/1");
+            user = await Http.GetFromJsonAsync<ScratchUser>($"https://scratchdb.lefty.one/v3/user/info/{username}");
+
+            Console.WriteLine(user.Bio);
+            Console.WriteLine(user.Work);
+
+            splitBio = user.Bio.Split("<br>");
+            splitWork = user.Work.Split("<br>");
+
+            ocular = await Http.GetFromJsonAsync<OcularUser>($"https://my-ocular.jeffalo.net/api/user/{username}");
+
+            comments = await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"{AppSettings.ApiRoot}/Comments/users/{username}/1");
 
             foreach (Magnifier.Models.Comment comment in comments)
             {
@@ -85,13 +170,28 @@ else
         hasInitialised = true;
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JSRuntime.InvokeVoidAsync("bioWiwoLinks");
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        page = 1;
+        loadingMore = false;
+
+        await OnInitializedAsync();
+
+        StateHasChanged();
+    }
+
     private async Task LoadMore()
     {
         loadingMore = true;
 
         page++;
 
-        comments = comments.Concat(await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"https://magnifier-api.potatophant.net/api/Comments/users/{username}/{page}")).ToList();
+        comments = comments.Concat(await Http.GetFromJsonAsync<List<Magnifier.Models.Comment>>($"{AppSettings.ApiRoot}/Comments/users/{username}/{page}")).ToList();
 
         foreach (Magnifier.Models.Comment comment in comments)
         {

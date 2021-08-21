@@ -1,0 +1,151 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Magnifier</name>
+    </assembly>
+    <members>
+        <member name="M:Magnifier.Models.AuthController.GenerateCode">
+            <summary>
+            Get an auth code for use
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Models.AuthController.GetTokenAsync(System.String)">
+            <summary>
+            Get an auth token from a commented code
+            </summary>
+            <param name="code"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Models.AuthController.GetUser">
+            <summary>
+            Get the currently logged in user
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Models.AuthController.GetSettings">
+            <summary>
+            Get the currently logged in user's settings
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Models.AuthController.UpdateSettings(System.String)">
+            <summary>
+            Update the currently logged in user's settings
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Controllers.CommentsController.GetComment(System.Int32)">
+            <summary>
+            Get a comment from its id
+            </summary>
+            <param name="commentId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Controllers.CommentsController.GetCommentReactions(System.Int32)">
+            <summary>
+            Get a comment's reactions
+            </summary>
+            <param name="commentId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Controllers.CommentsController.GetIfProjectExistsAsync(System.Int32)">
+            <summary>
+            Check if a Scratch project exists
+            </summary>
+            <param name="projectId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Controllers.CommentsController.GetIfUserExistsAsync(System.String)">
+            <summary>
+            Check if a Scratch user exists
+            </summary>
+            <param name="username"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Controllers.CommentsController.GetIfStudioExistsAsync(System.Int32)">
+            <summary>
+            Check if a Scratch studio exists
+            </summary>
+            <param name="studioId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Controllers.CommentsController.GetProjectCommentsAsync(System.Int32,System.Int32)">
+             <summary>
+             Get the comments on a project
+             </summary>
+             <param name="projectId"></param>
+            <param name="page"></param>
+             <returns></returns>
+        </member>
+        <member name="M:Magnifier.Controllers.CommentsController.GetUserCommentsAsync(System.String,System.Int32)">
+            <summary>
+            Get the comments on a user profile
+            </summary>
+            <param name="username"></param>
+            <param name="page"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Controllers.CommentsController.GetStudioCommentsAsync(System.Int32,System.Int32)">
+            <summary>
+            Get the comments on a studio
+            </summary>
+            <param name="studioId"></param>
+            <param name="page"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Controllers.CommentsController.PutReaction(System.Int32,System.String)">
+            <summary>
+            React to a comment
+            </summary>
+            <param name="commentId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Controllers.CommentsController.GetStars">
+            <summary>
+            Get all the stars for the logged in user
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Controllers.CommentsController.StarComment(System.Int32)">
+            <summary>
+            Star/unstar a comment
+            </summary>
+            <param name="commentId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Controllers.ReactionsController.GetReactions">
+            <summary>
+            Get all the available reactions
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Controllers.ReactionsController.GetReaction(System.String)">
+            <summary>
+            Get a reaction by its name
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Controllers.ReactionsController.CreateReaction(System.String,System.String)">
+            <summary>
+            Create a new reaction
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Controllers.ReactionsController.DeleteReaction(System.String)">
+            <summary>
+            Deletes a reaction
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Magnifier.Controllers.UpController.GetUp">
+            <summary>
+            something stupid
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

@@ -1,14 +1,56 @@
-﻿@if (size == 1)
+﻿@if (span)
 {
-    <p class="text-6xl text-@colour font-didactGothic">@ChildContent</p>
+    @if (size == 1)
+    {
+        <span class="inline text-6xl text-@colour font-didactGothic">@ChildContent</span>
+    }
+    else if (size == 2)
+    {
+        <span class="inline text-5xl text-@colour font-didactGothic">@ChildContent</span>
+    }
+    else if (size == 3)
+    {
+        <span class="inline text-4xl text-@colour font-didactGothic">@ChildContent</span>
+    }
+    else if (size == 4)
+    {
+        <span class="inline text-3xl text-@colour font-didactGothic">@ChildContent</span>
+    }
+    else if (size == 5)
+    {
+        <span class="inline text-2xl text-@colour font-didactGothic">@ChildContent</span>
+    }
+    else if (size == 6)
+    {
+        <span class="inline text-base text-@colour font-didactGothic">@ChildContent</span>
+    }
 }
-else if (size == 2)
+else
 {
-    <p class="text-5xl text-@colour font-didactGothic">@ChildContent</p>
-}
-else if (size == 3)
-{
-    <p class="text-4xl text-@colour font-didactGothic">@ChildContent</p>
+    @if (size == 1)
+    {
+        <p class="text-6xl text-@colour font-didactGothic">@ChildContent</p>
+    }
+    else if (size == 2)
+    {
+        <p class="text-5xl text-@colour font-didactGothic">@ChildContent</p>
+    }
+    else if (size == 3)
+    {
+        <p class="text-4xl text-@colour font-didactGothic">@ChildContent</p>
+    }
+    else if (size == 4)
+    {
+        <p class="text-3xl text-@colour font-didactGothic">@ChildContent</p>
+    }
+    else if (size == 5)
+    {
+        <p class="text-2xl text-@colour font-didactGothic">@ChildContent</p>
+    }
+    else if (size == 6)
+    {
+        <p class="text-base text-@colour font-didactGothic">@ChildContent</p>
+    }
 }
 
 @code {
@@ -20,4 +62,7 @@ else if (size == 3)
 
     [Parameter]
     public string colour { get; set; }
+
+    [Parameter]
+    public bool span { get; set; }
 }

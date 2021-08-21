@@ -7,6 +7,7 @@ using Spyglass.Services;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,11 +22,15 @@ namespace Spyglass
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
+            builder.Services.AddSingleton(builder.Configuration.Get<AppSettings>());
+
             builder.Services.AddBlazoredLocalStorage();
 
             builder.Services.AddScoped<AuthenticationService>();
 
             builder.Services.AddScoped<ReactionService>();
+
+            builder.Services.AddScoped<SettingsService>();
 
             WebAssemblyHost host = builder.Build();
 

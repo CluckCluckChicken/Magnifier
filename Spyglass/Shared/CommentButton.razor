@@ -1,4 +1,11 @@
-﻿<button @onclick="@onClick" class="bg-none hover:bg-none active:outline-none focus:outline-none cursor-pointer text-grey text-xs px-2">@ChildContent</button>
+﻿@if (bigger)
+{
+    <button @onclick="@onClick" class="bg-none hover:bg-none active:outline-none focus:outline-none cursor-pointer text-grey text-base px-2">@ChildContent</button>
+}
+else
+{
+    <button @onclick="@onClick" class="bg-none hover:bg-none active:outline-none focus:outline-none cursor-pointer text-grey text-xs px-2">@ChildContent</button>
+}
 
 @code {
     [Parameter]
@@ -6,4 +13,7 @@
 
     [Parameter]
     public EventCallback onClick { get; set; }
+
+    [Parameter]
+    public bool bigger { get; set; }
 }

@@ -1,0 +1,55 @@
+﻿@page "/settings"
+@using Models
+@using Services
+@inject IJSRuntime JSRuntime
+@inject SettingsService SettingsService
+
+<div class="px-4">
+    <Heading size="2">Settings</Heading>
+    @if (hasInitialised)
+    {
+        <EditForm Model="@settings" OnValidSubmit="@SaveSettings">
+            <InputRadioGroup @bind-Value="@settings.embedPlayer">
+                <Heading size="3">Project player:</Heading>
+                @foreach (var embedPlayer in Enum.GetValues(typeof(EmbedPlayer)))
+                    {
+                    <InputRadio Value="embedPlayer" />
+                    <span>@embedPlayer</span>
+                    <br />
+                    }
+            </InputRadioGroup>
+            <br />
+            <Button primary>Save</Button>
+        </EditForm>
+    }
+    else
+    {
+        <Loading />
+    }
+</div>
+
+@code {
+    private bool hasInitialised = false;
+
+    private Models.Settings settings;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SettingsService.Load();
+
+        settings = SettingsService.settings;
+
+        Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(settings));
+
+        hasInitialised = true;
+    }
+
+    private async Task SaveSettings()
+    {
+        SettingsService.settings = settings;
+
+        await SettingsService.Save();
+
+        await JSRuntime.InvokeVoidAsync("alert", "Changes saved!");
+    }
+}

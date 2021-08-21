@@ -7,14 +7,23 @@ using System.Threading.Tasks;
 
 namespace Magnifier.Models
 {
+    public enum Residence
+    {
+        Project,
+        User,
+        Studio
+    }
+
     public record Comment
     {
         public Comment() { }
 
-        public Comment(int _commentId, ScratchComment _comment, bool _isReply, List<Comment> _replies)
+        public Comment(int _commentId, ScratchComment _comment, Residence _residence, string _residenceId, bool _isReply, List<Comment> _replies)
         {
             commentId = _commentId;
             comment = _comment;
+            residence = _residence;
+            residenceId = _residenceId;
             isReply = _isReply;
             replies = _replies;
 
@@ -26,9 +35,15 @@ namespace Magnifier.Models
         [BsonIgnoreIfDefault]
         public string _id { get; set; }
 
+        // User info
+
         public int commentId { get; set; }
 
         public ScratchComment comment { get; set; }
+
+        public Residence residence { get; set; }
+
+        public string residenceId { get; set; }
 
         public List<UserReaction> reactions { get; set; }
 
@@ -37,5 +52,9 @@ namespace Magnifier.Models
         public bool isReply { get; set; }
 
         public List<Comment> replies { get; set; }
+
+        // Other stuff
+
+        public List<int> stars { get; set; } // List of ids of the comments that this user has starred
     }
 }

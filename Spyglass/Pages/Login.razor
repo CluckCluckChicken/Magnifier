@@ -1,8 +1,9 @@
 ﻿@page "/login"
 @using Models
 @using Services
-@inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
+@inject AppSettings AppSettings
 @inject AuthenticationService AuthenticationService
+@inject Blazored.LocalStorage.ISyncLocalStorageService LocalStorage
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
@@ -14,8 +15,8 @@
     <Heading size="3">Your auth code is:</Heading>
     <div>@authCode</div>
     <Heading size="3">Comment the code in the authentication Scratch project, then press "Done".</Heading>
-    <Button onClick="@ShowAuthProject">Show Project</Button>
-    <Button onClick="@CompleteAuth">Done</Button>
+    <Button onClick="@ShowAuthProject" primary>Show Project</Button>
+    <Button onClick="@CompleteAuth" primary>Done</Button>
     @if (failed)
     {
         <Heading size="3"><span class="text-red">Auth failed. Make sure that your comment contains just the code and nothing else.</span></Heading>
@@ -35,7 +36,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        authCode = await Http.GetStringAsync($"https://magnifier-api.potatophant.net/api/Auth/code");
+        authCode = await Http.GetStringAsync($"{AppSettings.ApiRoot}/Auth/code");
     }
 
     private async Task ShowAuthProject()
