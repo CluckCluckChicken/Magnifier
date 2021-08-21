@@ -4,11 +4,13 @@ using Magnifier.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -670,11 +672,19 @@ namespace Magnifier.Controllers
             return Ok(JsonConvert.SerializeObject(user.stars));
         }
 
-        [HttpGet("query/{query}")]
+        [HttpGet("query")]
         public ActionResult QueryComments(string query)
         {
-            List<Comment> result = commentSearchService.QueryComments(JsonConvert.DeserializeObject<List<CommentSearchRequirement>>(query));
-            return Ok(result);
+            try
+            {
+                List<Comment> result = commentSearchService.QueryComments(System.Text.Json.JsonSerializer.Deserialize<List<CommentSearchRequirement>>(Base64UrlEncoder.Decode(query)));
+
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
         
         /// <summary>

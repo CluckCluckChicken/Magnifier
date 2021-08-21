@@ -1,5 +1,7 @@
 ﻿@page "/browse"
+
 @using Services
+
 @inject AppSettings AppSettings 
 @inject HttpClient Http
 @inject Microsoft.Extensions.Configuration.IConfiguration config
@@ -53,11 +55,6 @@
     private string projectProgress;
     private string profileProgress;
     private string studioProgress;
-
-    protected override void OnInitialized()
-    {
-        Console.WriteLine(config["ApiRoot"]);
-    }
 
     private async Task ViewProjectComments()
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Magnifier.Models
+namespace Spyglass.Models
 {
     public enum Requirement
     {

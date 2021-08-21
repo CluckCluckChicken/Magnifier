@@ -43,10 +43,9 @@ namespace Magnifier.Services
         {
             string[] bindings =
             {
-                typeof(Comment).GetProperty("commentId").GetValue(comment, null).ToString(),
-                typeof(ScratchComment).GetProperty("content").GetValue(comment.comment, null).ToString(),
-                typeof(ScratchComment).GetProperty("datetime_created").GetValue(comment.comment, null).ToString(),
-                typeof(ScratchCommentAuthor).GetProperty("username").GetValue(comment.comment.author, null).ToString()
+                typeof(Comment).GetProperty("commentId").GetValue(comment).ToString(),
+                typeof(ScratchComment).GetProperty("content").GetValue(comment.comment).ToString(),
+                typeof(ScratchCommentAuthor).GetProperty("username").GetValue(comment.comment.author).ToString()
             };
 
             return bindings[(int)requirement];
