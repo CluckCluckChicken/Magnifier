@@ -28,7 +28,11 @@ namespace Spyglass.Services
 
         public async Task Load()
         {
-            if (AuthenticationService.user != null)
+            if (AuthenticationService.user == null)
+            {
+                settings = new Settings(EmbedPlayer.Scratch);
+            }
+            else
             {
                 HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"{AppSettings.ApiRoot}/Auth/settings");
                 request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AuthenticationService.token);

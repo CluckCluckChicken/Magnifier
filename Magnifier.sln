@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Magnifier", "Magnifier\Magn
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spyglass", "Spyglass\Spyglass.csproj", "{255A6C3F-D693-4BD3-A6D2-6D4B69A94042}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spyglass.Server", "Spyglass.Server\Spyglass.Server.csproj", "{79A20367-CEE2-4577-A4E9-C699922E29A2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{255A6C3F-D693-4BD3-A6D2-6D4B69A94042}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{255A6C3F-D693-4BD3-A6D2-6D4B69A94042}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{255A6C3F-D693-4BD3-A6D2-6D4B69A94042}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79A20367-CEE2-4577-A4E9-C699922E29A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79A20367-CEE2-4577-A4E9-C699922E29A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79A20367-CEE2-4577-A4E9-C699922E29A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79A20367-CEE2-4577-A4E9-C699922E29A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
