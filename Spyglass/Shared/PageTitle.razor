@@ -16,17 +16,17 @@
         set
         {
             this._title = value;
-            setTitle();
+            SetTitle();
         }
     }
 
 
     protected override void OnAfterRender(bool firstRender)
     {
-        setTitle();
+        SetTitle();
     }
 
-    private void setTitle()
+    private void SetTitle()
     {
         if (Environment.GetEnvironmentVariable("SPYGLASS_PRERENDER_CONTEXT") != "true")
         {
